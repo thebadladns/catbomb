@@ -4,14 +4,6 @@ window.onload = function() {
 
     function preload () {
         
-        console.log(game.antialias);
-        game.antialias = false;
-
-        game.scale.maxWidth = 160*3;
-        game.scale.maxHeight = 144*3;
-
-        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        game.scale.setScreenSize();
 
     }
 

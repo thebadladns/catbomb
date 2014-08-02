@@ -23,6 +23,8 @@ CBGame.Preloader.prototype = {
 
 		// Load assets for the game here...
 		this.load.image('logo', 'assets/dummy.png');
+		this.load.image('basic', 'assets/tilesbasic.png');
+		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON)
 		// this.load.atlas('spriteset', 'assets/spritesheet.png', 'assets/spritesheet.json');
 		// this.load.spritesheet('play','assets/play.png',400,110);
 	},

@@ -1,9 +1,9 @@
 window.onload = function() {
 
-    var game = new Phaser.Game(160, 144, Phaser.AUTO, '', { preload: preload, create: create }, false, false);
+    var game = new Phaser.Game(160, 144, Phaser.AUTO, '', { preload: preload }, false, false);
 
     function preload () {
-
+        
         console.log(game.antialias);
         game.antialias = false;
 
@@ -13,14 +13,10 @@ window.onload = function() {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.scale.setScreenSize();
 
-        game.load.image('logo', 'assets/phaser.png');
-
     }
 
-    function create () {
+    game.state.add('Preloader', CBGame.Preloader);
+    game.state.add('Gameplay', CBGame.Gameplay);
 
-        var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-        logo.anchor.setTo(0.5, 0.5);
-
-    }
+    game.state.start("Preloader");
 }

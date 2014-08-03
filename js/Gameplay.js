@@ -28,59 +28,33 @@ CBGame.Gameplay.prototype = {
         this.player = undefined;
         this.ladders = this.add.group();
         this.ladders.enableBody = true;
+        this.oneways = this.add.group();
+        this.oneways.enableBody = true;
 
         var objects = map.objects['Object Layer 1'];
         this.loadMapObjects(objects);
-        
-        this.player.animations.add('left', [2, 3], 6, true);
-        this.player.animations.add('right', [0, 1], 6, true);
-
-        this.physics.arcade.enable(this.player);
-        this.player.body.gravity.y = 300;
-        this.player.body.center.setTo(8, 8);
-        this.player.body.setSize(14, 15, 1, 1);
-        this.player.body.collideWithBounds = true;
-
-        this.camera.follow(this.player,  Phaser.Camera.PLATFORMER);
 
         cursors = this.input.keyboard.createCursorKeys();
 	},
 
 	update: function() {
-		this.player.onLadder = false;
+		
+		this.player.beforeUpdate();
 
-		this.physics.arcade.collide(this.player, this.ground);
-		this.physics.arcade.overlap(this.player, this.ladders, this.playerOnLadder, null, this);
+		this.physics.arcade.collide(this.player.self, this.ground);
+		this.physics.arcade.collide(this.player.self, this.oneways);
+		this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
 
-		this.player.body.velocity.x = 0;
-
-		if (cursors.left.isDown) {
-			this.player.body.velocity.x = -60;
-			this.player.animations.play('left');
-		} else if (cursors.right.isDown) {
-			this.player.body.velocity.x = 60;
-			this.player.animations.play('right');
-		} else {
-			this.player.animations.stop();
-		}
-
-		if (this.player.onLadder)
-			this.player.tint = 0x9a058c;
-		else
-			this.player.tint = 0xffffff;
-
-		/*if (cursors.up.isDown) {
-			this.player.body.velocity.y = -120;
-		} else if (cursors.down.isDown) {
-			this.player.body.velocity.y = 120;
-		}*/
+		this.player.onUpdate();	
 	},
 
 	render: function() {
-	},
+		/*this.player.onRender();
 
-	playerOnLadder: function(a, b, c) {
-		this.player.onLadder = true;
+		for (var i = 0; i < this.ladders.children.length; i++)
+			this.game.debug.body(this.ladders.children[i]);
+		for (var i = 0; i < this.oneways.children.length; i++)
+			this.game.debug.body(this.oneways.children[i]);*/
 	},
 
 	loadMapObjects: function(objects) {
@@ -88,14 +62,24 @@ CBGame.Gameplay.prototype = {
 			var o = objects[index];
 			switch (o.name) {
 				case "Cat":
-					this.player = this.add.sprite(o.x, o.y, 'cat');
+					// this.player = this.add.sprite(o.x, o.y, 'cat');
+					this.player = new CBGame.Cat(o.x, o.y, this.game, this);
+					this.player.onCreate();
 					break;
 				case "Ladder":
-					var ladder = this.ladders.create(o.x, o.y);
-					ladder.body.setSize(o.width/2, o.height, o.width/4);
+					var ladder = this.ladders.create(o.x, o.y-1);
+					ladder.name = "ladder" + index;
+					ladder.body.setSize(2, o.height+1, o.width/2-1);
 					ladder.body.immovable = true;
 		            ladder.body.customSeparateX = true;
 		            ladder.body.customSeparateY = true;
+		            var oneway = this.oneways.create(o.x, o.y);
+		            oneway.name = "oneway" + index;
+		            oneway.body.setSize(o.width, 8);
+		            oneway.body.immovable = true;
+		            oneway.body.checkCollision.down = false;
+		            oneway.body.checkCollision.right = false;
+		            oneway.body.checkCollision.left = false;
 					break;
 			}
         }

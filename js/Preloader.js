@@ -11,8 +11,6 @@ CBGame.Preloader = function(game) {
 
 CBGame.Preloader.prototype = {
 	preload: function() {
-		this.antialias = false;
-
 		this.stage.smoothed = false;
 
         this.scale.maxWidth = 160*3;
@@ -20,6 +18,8 @@ CBGame.Preloader.prototype = {
 
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.setScreenSize();
+
+        this.stage.smoothed = false;
 
 		// SetBackground and preloadBar
 

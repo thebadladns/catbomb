@@ -12,6 +12,9 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="40" height="18">
-  <object name="SpawnPoint" x="160" y="48" width="16" height="16"/>
+  <object name="Cat" x="160" y="48" width="16" height="16"/>
+  <object name="Ladder" x="96" y="96" width="16" height="32"/>
+  <object name="Ladder" x="128" y="64" width="16" height="32"/>
+  <object name="Ladder" x="8" y="64" width="16" height="32"/>
  </objectgroup>
 </map>

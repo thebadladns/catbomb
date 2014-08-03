@@ -13,6 +13,8 @@ CBGame.Preloader.prototype = {
 	preload: function() {
 		this.antialias = false;
 
+		this.stage.smoothed = false;
+
         this.scale.maxWidth = 160*3;
         this.scale.maxHeight = 144*3;
 
@@ -24,6 +26,7 @@ CBGame.Preloader.prototype = {
 		// Load assets for the game here...
 		this.load.image('logo', 'assets/dummy.png');
 		this.load.image('basic', 'assets/tilesbasic.png');
+
 		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON)
 		// this.load.atlas('spriteset', 'assets/spritesheet.png', 'assets/spritesheet.json');
 		// this.load.spritesheet('play','assets/play.png',400,110);

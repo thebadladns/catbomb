@@ -51,6 +51,10 @@ CBGame.Gameplay.prototype = {
 		this.physics.arcade.collide(this.bombs, this.player.self);
 
 		this.player.onUpdate();	
+
+		for (var i = 0; i < this.bombs.children.length; i++) {
+			this.bombs.getAt(i).wrappedBy.onUpdate();
+		}
 	},
 
 	render: function() {

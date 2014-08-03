@@ -35,7 +35,7 @@
                     {
 
                     },
-                 "type":"",
+                 "type":"Ladder",
                  "visible":true,
                  "width":16,
                  "x":96,
@@ -48,7 +48,7 @@
                     {
 
                     },
-                 "type":"",
+                 "type":"Ladder",
                  "visible":true,
                  "width":16,
                  "x":128,
@@ -61,7 +61,7 @@
                     {
 
                     },
-                 "type":"",
+                 "type":"Ladder",
                  "visible":true,
                  "width":16,
                  "x":8,
@@ -72,9 +72,9 @@
                  "name":"Bomb",
                  "properties":
                     {
-                     "active":"false"
+                     "active":"1"
                     },
-                 "type":"",
+                 "type":"Bomb",
                  "visible":true,
                  "width":0,
                  "x":72,
@@ -92,6 +92,32 @@
                  "width":16,
                  "x":296,
                  "y":48
+                }, 
+                {
+                 "height":0,
+                 "name":"Bomb",
+                 "properties":
+                    {
+                     "active":"1"
+                    },
+                 "type":"Bomb",
+                 "visible":true,
+                 "width":0,
+                 "x":32,
+                 "y":88
+                }, 
+                {
+                 "height":0,
+                 "name":"Bomb",
+                 "properties":
+                    {
+                     "active":"0"
+                    },
+                 "type":"Bomb",
+                 "visible":true,
+                 "width":0,
+                 "x":200,
+                 "y":56
                 }],
          "opacity":1,
          "type":"objectgroup",

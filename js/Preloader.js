@@ -27,6 +27,9 @@ CBGame.Preloader.prototype = {
 		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON)
 		// this.load.atlas('spriteset', 'assets/spritesheet.png', 'assets/spritesheet.json');
 		// this.load.spritesheet('play','assets/play.png',400,110);
+
+		this.load.image('ground', 'assets/ground.png');
+		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
 	},
 
 	create: function() {		

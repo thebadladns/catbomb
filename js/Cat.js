@@ -36,7 +36,7 @@ CBGame.Cat.prototype = {
 		else
 			this.self.tint = 0xffffff;*/
 
-		if (!this.self.climbing) {
+		if (!this.self.climbing && this.self.body.velocity.y == 0) {
 			if (cursors.left.isDown) {
 				this.self.body.velocity.x = -60;
 				this.self.animations.play('left');
@@ -89,5 +89,49 @@ CBGame.Cat.prototype = {
 		}
 
 		return true;
+	}
+}
+
+CBGame.Bomb = function(x, y, game, world, config) {
+	this.self = world.add.sprite(x, y, 'bomb');
+	this.game = game;
+	this.world = world;
+
+	this.self.state = config.state | config.state;
+}
+
+CBGame.Bomb.prototype = {
+	STATE_IDLE: 0,
+	STATE_ACTIVE: 1,
+
+	onCreate: function() {
+		this.self.animations.add('idle', [0], 1, true);
+        this.self.animations.add('active', [1, 2], 3, true);
+
+        this.game.physics.arcade.enable(this.self);
+        this.self.body.immovable = true;
+        this.self.body.gravity.y = 300;
+        this.self.body.center.setTo(8, 8);
+        this.self.body.setSize(16, 12, 0, 8);
+        this.self.body.collideWithBounds = true;
+	},
+
+	beforeUpdate: function() {
+
+	},
+
+	onUpdate: function() {
+		switch (this.self.state) {
+			case this.STATE_IDLE:
+				this.self.animations.play("idle");
+				break;
+			case this.STATE_ACTIVE:
+				this.self.animations.play("active");
+				break;
+		}
+	},
+
+	onRender: function() {
+
 	}
 }

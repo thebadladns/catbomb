@@ -30,6 +30,8 @@ CBGame.Gameplay.prototype = {
         this.ladders.enableBody = true;
         this.oneways = this.add.group();
         this.oneways.enableBody = true;
+        this.bombs = this.add.group();
+        this.bombs.enableBody = true;
 
         var objects = map.objects['Object Layer 1'];
         this.loadMapObjects(objects);
@@ -45,6 +47,9 @@ CBGame.Gameplay.prototype = {
 		this.physics.arcade.collide(this.player.self, this.oneways);
 		this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
 
+		this.physics.arcade.collide(this.bombs, this.ground);
+		this.physics.arcade.collide(this.bombs, this.player.self);
+
 		this.player.onUpdate();	
 	},
 
@@ -55,6 +60,9 @@ CBGame.Gameplay.prototype = {
 			this.game.debug.body(this.ladders.children[i]);
 		for (var i = 0; i < this.oneways.children.length; i++)
 			this.game.debug.body(this.oneways.children[i]);*/
+
+		for (var i = 0; i < this.bombs.children.length; i++)
+			this.game.debug.body(this.bombs.children[i]);
 	},
 
 	loadMapObjects: function(objects) {
@@ -67,12 +75,14 @@ CBGame.Gameplay.prototype = {
 					this.player.onCreate();
 					break;
 				case "Ladder":
+					// Spawn the ladder
 					var ladder = this.ladders.create(o.x, o.y-1);
 					ladder.name = "ladder" + index;
 					ladder.body.setSize(2, o.height+1, o.width/2-1);
 					ladder.body.immovable = true;
 		            ladder.body.customSeparateX = true;
 		            ladder.body.customSeparateY = true;
+		            // Spawn the oneway platform of the top
 		            var oneway = this.oneways.create(o.x, o.y);
 		            oneway.name = "oneway" + index;
 		            oneway.body.setSize(o.width, 8);
@@ -80,6 +90,14 @@ CBGame.Gameplay.prototype = {
 		            oneway.body.checkCollision.down = false;
 		            oneway.body.checkCollision.right = false;
 		            oneway.body.checkCollision.left = false;
+					break;
+				case "Bomb":
+					var bomb = new CBGame.Bomb(o.x, o.y, this.game, this, {
+						state: o.properties.active
+					});
+					bomb.self.name = "bomb"+index;
+					bomb.onCreate();
+					this.bombs.add(bomb.self);
 					break;
 			}
         }

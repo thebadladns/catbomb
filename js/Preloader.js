@@ -11,7 +11,6 @@ CBGame.Preloader = function(game) {
 
 CBGame.Preloader.prototype = {
 	preload: function() {
-		this.stage.smoothed = false;
 
         this.scale.maxWidth = 160*3;
         this.scale.maxHeight = 144*3;
@@ -19,7 +18,7 @@ CBGame.Preloader.prototype = {
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.setScreenSize();
 
-        this.stage.smoothed = false;
+        // this.stage.smoothed = false;
 
 		// SetBackground and preloadBar
 
@@ -33,6 +32,7 @@ CBGame.Preloader.prototype = {
 
 		this.load.image('ground', 'assets/ground.png');
 		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
+		this.load.spritesheet('bomb', 'assets/bomb.png', 20, 20);
 	},
 
 	create: function() {		

@@ -2,7 +2,7 @@ CBGame.Gameplay = function(game) {
 }
 
 CBGame.Gameplay.prototype = {
-	create: function() {
+	create: function(a, b, c) {
 
 		window.gameplay = this;
 
@@ -32,6 +32,8 @@ CBGame.Gameplay.prototype = {
         this.oneways.enableBody = true;
         this.bombs = this.add.group();
         this.bombs.enableBody = true;
+        this.fire = this.add.group();
+        this.fire.enableBody = true;
 
         var objects = map.objects['Object Layer 1'];
         this.loadMapObjects(objects);
@@ -43,12 +45,16 @@ CBGame.Gameplay.prototype = {
 		
 		this.player.beforeUpdate();
 
-		this.physics.arcade.collide(this.player.self, this.ground);
-		this.physics.arcade.collide(this.player.self, this.oneways);
-		this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
+		if (this.player.isAlive) {
+			this.physics.arcade.collide(this.player.self, this.ground);
+			this.physics.arcade.collide(this.player.self, this.oneways);
+			this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
+			this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
+			this.physics.arcade.collide(this.player.self, this.bombs);
+		}
 
 		this.physics.arcade.collide(this.bombs, this.ground);
-		this.physics.arcade.collide(this.bombs, this.player.self);
+		
 
 		this.player.onUpdate();	
 
@@ -58,15 +64,15 @@ CBGame.Gameplay.prototype = {
 	},
 
 	render: function() {
-		/*this.player.onRender();
+		// this.player.onRender();
 
-		for (var i = 0; i < this.ladders.children.length; i++)
+		/*for (var i = 0; i < this.ladders.children.length; i++)
 			this.game.debug.body(this.ladders.children[i]);
 		for (var i = 0; i < this.oneways.children.length; i++)
 			this.game.debug.body(this.oneways.children[i]);*/
 
-		for (var i = 0; i < this.bombs.children.length; i++)
-			this.game.debug.body(this.bombs.children[i]);
+		/*for (var i = 0; i < this.bombs.children.length; i++)
+			this.game.debug.body(this.bombs.children[i]);*/
 	},
 
 	loadMapObjects: function(objects) {
@@ -103,7 +109,51 @@ CBGame.Gameplay.prototype = {
 					bomb.onCreate();
 					this.bombs.add(bomb.self);
 					break;
+				case "Fire":
+					var fire = this.fire.create(o.x, o.y, "fire");
+					fire.animations.add('idle', [0, 1], 4, true);
+					fire.animations.play('idle');
+					fire.name = "fire" + index;
+					fire.body.customSeparateX = true;
+					fire.body.customSeparateY = true;
+					break;
 			}
         }
 	}
 }
+
+CBGame.PreGameplay = function(game) {
+
+};
+
+CBGame.PreGameplay.prototype = {
+	create: function() {
+		this.Start = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+
+		this.stage.backgroundColor = 0xf8fcf8;
+		this.renderText(40, 40, "WORLD  0" + CBGame.Data.world);
+		this.renderText(40, 48, "LEVEL  0" + CBGame.Data.level);
+
+		this.renderText(40, 64, "LIVES  0" + CBGame.Data.lives);
+
+		this.renderText(40, 80, " - GO! - ");
+	},
+
+	update: function() {
+		if (this.Start.justPressed()) {
+			this.game.state.start("Gameplay");
+		}
+	},
+
+	render: function() {
+
+	},
+
+	// Remember to NOT copy this and generalize!!
+	renderText: function(x, y, string) {
+		var text = string.toUpperCase();
+    	var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+
+    	this.add.text(x, y, text, style);
+	}
+};

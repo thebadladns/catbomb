@@ -1,7 +1,7 @@
 // Player class
 
-CBGame.Cat = function(x, y, game, world) {
-	this.self = world.add.sprite(x, y, 'cat');
+CBGame.Cat = function(x, y, game, scene) {
+	this.self = scene.add.sprite(x, y, 'cat');
 	
 	// Ha ha hacking to get an onPostUpdate event
 	this.self.wrappedBy = this;
@@ -12,11 +12,14 @@ CBGame.Cat = function(x, y, game, world) {
 	};
 
 	this.game = game;
-	this.world = world;
+	this.scene = scene;
 
 	this.cursors = game.input.keyboard.createCursorKeys();
 	this.A = game.input.keyboard.addKey(Phaser.Keyboard.A);
 	this.B = game.input.keyboard.addKey(Phaser.Keyboard.S);
+
+	this.self.inputEnabled = true;
+    this.self.input.enableDrag();
 }
 
 CBGame.Cat.prototype = {
@@ -30,6 +33,7 @@ CBGame.Cat.prototype = {
 	onCreate: function() {
 		this.self.animations.add('left', [2, 3], 6, true);
         this.self.animations.add('right', [0, 1], 6, true);
+        this.self.animations.add('dead', [4, 5], 4, true);
 
         this.game.physics.arcade.enable(this.self);
         this.self.body.gravity.y = 300;
@@ -37,8 +41,9 @@ CBGame.Cat.prototype = {
         this.self.body.setSize(14, 15, 1, 1);
         this.self.body.collideWithBounds = true;
 
-        this.world.camera.follow(this.self,  Phaser.Camera.PLATFORMER);
+        this.scene.camera.follow(this.self,  Phaser.Camera.PLATFORMER);
 
+		this.isAlive = true;
         this.facing = this.RIGHT;
         this.carrying = {
         	type: this.TYPE_NONE,
@@ -47,101 +52,126 @@ CBGame.Cat.prototype = {
 	},
 
 	beforeUpdate: function() {
-		this.self.onLadder = false;
-		this.self.body.velocity.x = 0;
-		/*if (this.carrying.type != this.TYPE_NONE) {
-			this.carrying.reference.body.velocity.x = 0;
-		}*/
+		if (this.isAlive) {
+			this.self.onLadder = false;
+			this.self.body.velocity.x = 0;
+			/*if (this.carrying.type != this.TYPE_NONE) {
+				this.carrying.reference.body.velocity.x = 0;
+			}*/
+		}
 	},
 
 	onUpdate: function() {
 
 		document.getElementById('label').textContent = this.facing;
 
-		/*if (this.self.onLadder)
-			this.self.tint = 0x9a058c;
-		else
-			this.self.tint = 0xffffff;*/
+		if (this.isAlive) {
 
-		if (!this.self.climbing && this.self.body.velocity.y == 0) {
-			if (cursors.left.isDown) {
-				this.self.body.velocity.x = -60;
-				this.self.animations.play('left');
-				this.facing = this.LEFT;
-			} else if (cursors.right.isDown) {
-				this.self.body.velocity.x = 60;
-				this.self.animations.play('right');
-				this.facing = this.RIGHT;
-			} else {
-				this.self.animations.stop();
-			}
-		}
+			/*if (this.self.onLadder)
+				this.self.tint = 0x9a058c;
+			else
+				this.self.tint = 0xffffff;*/
 
-		if (this.B.justPressed(1)) {
-			// Pick up
-			if (this.carrying.type == this.TYPE_NONE) {
-				var carryData = this.checkForBomb(); // Checkforpickable
-				if (carryData.type != this.TYPE_NONE) {
-					// Got anything
-					// Make it portable
-					var bomb = carryData.reference;
-					bomb.body.immovable = false;
-					bomb.body.gravity.y = 0;
-					// Lift it
-					bomb.oldz = bomb.z;
-					bomb.z = this.self.z+1;
-					// And remember you got it
-					this.carrying.type = carryData.type;
-					this.carrying.reference = carryData.reference; 
+			if (!this.self.climbing && this.self.body.velocity.y == 0) {
+				if (cursors.left.isDown) {
+					this.self.body.velocity.x = -60;
+					this.self.animations.play('left');
+					this.facing = this.LEFT;
+				} else if (cursors.right.isDown) {
+					this.self.body.velocity.x = 60;
+					this.self.animations.play('right');
+					this.facing = this.RIGHT;
+				} else {
+					this.self.animations.stop();
 				}
-			} 
-			// Drop down
-			else {
-				// Drop what you got
-				// Make it solid
-				var bomb = this.carrying.reference;
-				bomb.body.immovable = true;
-				bomb.body.gravity.y = 300;
-				// Drop it
-				bomb.z = bomb.oldz;
-				bomb.y += 4;
-				if (this.facing == this.LEFT) {
-					if (this.self.body.onWall()) {
-						bomb.x = this.self.x;
-						this.self.x += 16;
-					} else {
-						bomb.x = this.self.x - 16;
-					}
-				} else if (this.facing == this.RIGHT) {
-					if (this.self.body.onWall()) {
-						bomb.x = this.self.x;
-						this.self.x -= 16;
-					} else {
-						bomb.x = this.self.x + 16;
-					}
-				}
-				// And forget you got it
-				this.carrying.type = this.TYPE_NONE;
-				this.carrying.reference = null; 
 			}
-		}
 
-		if (!this.self.onLadder) {
-			this.self.body.gravity.y = 300;
-			this.self.climbing = false;
-		} else if (this.self.onLadder && cursors.up.isDown) {
-			this.self.x = this.self.currentLadder.x;
-			this.self.y -= 1;
-			this.self.body.gravity.y = 0;
-			this.self.climbing = true;
-		} else if (this.self.onLadder && cursors.down.isDown) {
-			if (!this.checkForFloor()) {
-				this.self.y += 1;
-				this.self.body.gravity.y = 0;
-				this.self.x = this.self.currentLadder.x;
-				this.self.climbing = true;
-			} else {
+			if (this.B.justPressed(1)) {
+				// Pick up
+				if (this.carrying.type == this.TYPE_NONE) {
+					var carryData = this.checkForBomb(); // Checkforpickable
+					if (carryData.type != this.TYPE_NONE) {
+						// Got anything
+						// Make it portable
+						var bomb = carryData.reference;
+						bomb.body.immovable = false;
+						bomb.body.gravity.y = 0;
+						// Lift it
+						bomb.oldz = bomb.z;
+						bomb.z = this.self.z+1;
+						// And remember you got it
+						this.carrying.type = carryData.type;
+						this.carrying.reference = carryData.reference; 
+					}
+				} 
+				// Drop down
+				else {
+					// Drop what you got
+					// Make it solid
+					var bomb = this.carrying.reference;
+					bomb.body.immovable = true;
+					bomb.body.gravity.y = 300;
+					// Drop it
+					bomb.z = bomb.oldz;
+					bomb.y += 4;
+					if (this.facing == this.LEFT) {
+						if (this.self.body.onWall()) {
+							bomb.x = this.self.x;
+							this.self.x += 16;
+						} else {
+							bomb.x = this.self.x - 16;
+						}
+					} else if (this.facing == this.RIGHT) {
+						if (this.self.body.onWall()) {
+							bomb.x = this.self.x;
+							this.self.x -= 16;
+						} else {
+							bomb.x = this.self.x + 16;
+						}
+					}
+					// And forget you got it
+					this.carrying.type = this.TYPE_NONE;
+					this.carrying.reference = null; 
+				}
+			}
+
+			if (!this.self.onLadder) {
+				this.self.body.gravity.y = 300;
 				this.self.climbing = false;
+			} else if (this.self.onLadder && cursors.up.isDown) {
+				this.self.x = this.self.currentLadder.x;
+				this.self.y -= 1;
+				this.self.body.gravity.y = 0;
+				this.self.climbing = true;
+			} else if (this.self.onLadder && cursors.down.isDown) {
+				if (!this.checkForFloor()) {
+					this.self.y += 1;
+					this.self.body.gravity.y = 0;
+					this.self.x = this.self.currentLadder.x;
+					this.self.climbing = true;
+				} else {
+					this.self.climbing = false;
+				}
+			}
+
+		} else {
+			// DEAD CAT!!
+			
+			if (this.justDead) {
+				this.self.body.velocity.x = this.storedVelocityX;
+				this.self.body.velocity.y = this.storedVelocityY;
+				this.justDead = false;
+			}
+			this.self.body.acceleration.x = 
+				-1 * CBGame.Utils.sign(this.self.body.velocity.x) * 30;
+			this.self.animations.play('dead');
+
+			// Check out of bounds!
+			if (this.self.x < this.scene.world.bounds.left || 
+				this.self.x - this.self.width >= this.scene.world.bounds.right + 2 ||
+				this.self.y < this.scene.world.bounds.top || 
+				this.self.y - this.self.height >= this.scene.world.bounds.bottom + 2) {
+				this.onDeath();
 			}
 		}
 	},
@@ -199,7 +229,7 @@ CBGame.Cat.prototype = {
 		var oldx = this.self.body.x;
 		this.self.body.x = testx;
 
-		var bombs = this.world.bombs;
+		var bombs = this.scene.bombs;
 		for (var i = 0; i < bombs.length; i++) {
 			var bomb = bombs.getAt(i);
 			if (!bomb || !bomb.body)
@@ -214,16 +244,41 @@ CBGame.Cat.prototype = {
 		this.self.body.x = oldx;
 
 		return result;
+	},
+
+	onHitFire: function(me, fire) {
+		// Kill cat!
+		if (Math.abs(me.body.overlapX) < me.width / 4 &&
+			Math.abs(me.body.overlapY) < me.height/ 4)
+			return;
+
+		if (this.isAlive) {
+			console.log("dead!");
+			this.isAlive = false;
+			this.justDead = true;
+
+			this.storedVelocityX = CBGame.Utils.sign(me.x - fire.x) * 50;
+			this.storedVelocityY = -70;
+		}
+	},
+
+	onDeath: function() {
+		CBGame.Data.lives -= 1;
+		if (CBGame.Data.lives < 0) {
+			this.game.state.start("GameOver");
+		} else {
+			this.game.state.start("PreGameplay");
+		}
 	}
 }
 
-CBGame.Bomb = function(x, y, game, world, config) {
-	this.self = world.add.sprite(x, y, 'bomb');
+CBGame.Bomb = function(x, y, game, scene, config) {
+	this.self = scene.add.sprite(x, y, 'bomb');
 
 	this.self.wrappedBy = this;
 
 	this.game = game;
-	this.world = world;
+	this.scene = scene;
 
 	this.self.state = parseInt(config.state);
 }
@@ -242,6 +297,8 @@ CBGame.Bomb.prototype = {
         this.self.body.center.setTo(8, 8);
         this.self.body.setSize(16, 12, 0, 8);
         this.self.body.collideWithBounds = true;
+        this.self.body.checkCollision.left = false;
+        this.self.body.checkCollision.right = false;
         this.self.body.bounce.y = 0.2;
 	},
 

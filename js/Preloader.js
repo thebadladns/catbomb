@@ -44,11 +44,12 @@ CBGame.Preloader.prototype = {
 		this.load.image('title', 'assets/titletemp.png');
 		this.load.image('gameover', 'assets/gameovertemp.png');
 		this.load.image('basic', 'assets/tilesbasic.png');
-		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON)
+		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
 		this.load.image('ground', 'assets/ground.png');
 		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
 		this.load.spritesheet('bomb', 'assets/bomb.png', 20, 20);
-		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);		
+		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
+		this.load.spritesheet('explosion', 'assets/boom.png', 32, 32);
 	},
 
 	create: function() {		

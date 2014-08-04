@@ -253,11 +253,22 @@ CBGame.Cat.prototype = {
 			return;
 
 		if (this.isAlive) {
-			console.log("dead!");
+			console.log("death by fire");
 			this.isAlive = false;
 			this.justDead = true;
 
 			this.storedVelocityX = CBGame.Utils.sign(me.x - fire.x) * 50;
+			this.storedVelocityY = -70;
+		}
+	},
+
+	onHitExplosion: function(me, explosion) {
+		if (this.isAlive) {
+			console.log("death by explosion");
+			this.isAlive = false;
+			this.justDead = true;
+
+			this.storedVelocityX = CBGame.Utils.sign(me.x - explosion.x) * 50;
 			this.storedVelocityY = -70;
 		}
 	},
@@ -281,11 +292,14 @@ CBGame.Bomb = function(x, y, game, scene, config) {
 	this.scene = scene;
 
 	this.self.state = parseInt(config.state);
+	this.timer = null;
 }
 
 CBGame.Bomb.prototype = {
 	STATE_IDLE: 0,
 	STATE_ACTIVE: 1,
+
+	BOMB_TIMER: 3000, // in milliseconds
 
 	onCreate: function() {
 		this.self.animations.add('idle', [0], 1, true);
@@ -308,6 +322,26 @@ CBGame.Bomb.prototype = {
 
 	onUpdate: function() {
 
+		if (this.self.state == this.STATE_ACTIVE) {
+			if (this.timer == null) {
+				this.timer = this.game.time.create(true);
+				this.timer.add(this.BOMB_TIMER, this.onTimer, this);
+				this.timer.start();
+			}
+		} else {
+			// Check for fire!
+			var fs = this.scene.fire;
+			for (var i = 0; i < fs.length; i++) {
+				var f = fs.getAt(i);
+				if (!f || !f.body)
+					continue;
+				if (this.game.physics.arcade.intersects(this.self.body, f.body)) {
+					this.self.state = this.STATE_ACTIVE;
+					break;
+				}
+			}
+		}
+
 		if (this.self.body.onFloor()) {
 			this.self.body.bounce.y = 0;
 		} else {
@@ -322,6 +356,43 @@ CBGame.Bomb.prototype = {
 				this.self.animations.play("active");
 				break;
 		}
+	},
+
+	onRender: function() {	
+
+	},
+
+	onTimer: function(a, b, c) {
+		var boom = new CBGame.Explosion(this.self.x-8, this.self.y-4, this.game, this.scene);
+		boom.onCreate();
+		this.self.destroy();
+	}
+}
+
+CBGame.Explosion = function(x, y, game, scene) {
+	this.self = scene.explosions.create(x, y, 'explosion');
+	this.self.wrappedBy = this;
+	this.game = game;
+	this.scene = scene;
+};
+
+CBGame.Explosion.prototype = {
+	onCreate: function() {
+		this.self.animations.add('boom', [0,1,2,0], 15, false);
+        this.self.body.immovable = true;
+        this.self.body.setSize(30, 30, 1, 1);
+	},
+
+	beforeUpdate: function() {
+
+	},
+
+	onUpdate: function() {
+		if (this.self.animations.currentAnim.isFinished) {
+			this.self.destroy();
+		}
+
+		this.self.animations.play('boom');
 	},
 
 	onRender: function() {	

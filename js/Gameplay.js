@@ -34,6 +34,8 @@ CBGame.Gameplay.prototype = {
         this.bombs.enableBody = true;
         this.fire = this.add.group();
         this.fire.enableBody = true;
+        this.explosions = this.add.group();
+        this.explosions.enableBody = true;
 
         var objects = map.objects['Object Layer 1'];
         this.loadMapObjects(objects);
@@ -57,9 +59,11 @@ CBGame.Gameplay.prototype = {
 			this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
 			this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
 			this.physics.arcade.collide(this.player.self, this.bombs);
+			this.physics.arcade.overlap(this.player.self, this.explosions, this.player.onHitExplosion, null, this.player);
 		}
 
 		this.physics.arcade.collide(this.bombs, this.ground);
+		// this.physics.arcade.overlap(this.bombs, this.explosions, CBGame.Bomb.onHitExplosion, null);
 		
 
 		this.player.onUpdate();	
@@ -67,10 +71,15 @@ CBGame.Gameplay.prototype = {
 		for (var i = 0; i < this.bombs.children.length; i++) {
 			this.bombs.getAt(i).wrappedBy.onUpdate();
 		}
+
+		for (var i = 0; i < this.explosions.children.length; i++) {
+			if (this.explosions.getAt(i).wrappedBy)
+				this.explosions.getAt(i).wrappedBy.onUpdate();
+		}
 	},
 
 	render: function() {
-		// this.player.onRender();
+		//this.player.onRender();
 
 		/*for (var i = 0; i < this.ladders.children.length; i++)
 			this.game.debug.body(this.ladders.children[i]);
@@ -79,6 +88,8 @@ CBGame.Gameplay.prototype = {
 
 		/*for (var i = 0; i < this.bombs.children.length; i++)
 			this.game.debug.body(this.bombs.children[i]);*/
+		/*for (var i = 0; i < this.explosions.children.length; i++)
+			this.game.debug.body(this.explosions.children[i]);*/
 	},
 
 	loadMapObjects: function(objects) {

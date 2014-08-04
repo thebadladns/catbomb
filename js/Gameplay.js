@@ -38,6 +38,12 @@ CBGame.Gameplay.prototype = {
         var objects = map.objects['Object Layer 1'];
         this.loadMapObjects(objects);
 
+        // HUD
+		this.stageLabel = this.renderText(0, 137, "STAGE " + 
+			CBGame.Data.world + "-" + CBGame.Data.level, true);
+		this.livesLabel = this.renderText(136, 137, 
+			"Œ0" + CBGame.Data.lives, true);
+
         cursors = this.input.keyboard.createCursorKeys();
 	},
 
@@ -119,6 +125,15 @@ CBGame.Gameplay.prototype = {
 					break;
 			}
         }
+	},
+
+	renderText: function(x, y, string, fixedToCamera) {
+		var text = string.toUpperCase();
+    	var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+
+    	var text = this.add.text(x, y, text, style);
+    	text.fixedToCamera = fixedToCamera;
+    	return text;
 	}
 }
 

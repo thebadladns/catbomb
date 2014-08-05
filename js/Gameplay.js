@@ -10,7 +10,7 @@ CBGame.Gameplay.prototype = {
 
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 
-        map = this.add.tilemap('mapLevel0');
+        map = this.add.tilemap('stage' + CBGame.Data.world + '-' + CBGame.Data.level);
         map.addTilesetImage('basic');
         layer = map.createLayer('Tile Layer 1');
         layer.resizeWorld();
@@ -30,10 +30,10 @@ CBGame.Gameplay.prototype = {
         this.ladders.enableBody = true;
         this.oneways = this.add.group();
         this.oneways.enableBody = true;
-        this.bombs = this.add.group();
-        this.bombs.enableBody = true;
         this.fire = this.add.group();
         this.fire.enableBody = true;
+        this.bombs = this.add.group();
+        this.bombs.enableBody = true;
         this.explosions = this.add.group();
         this.explosions.enableBody = true;
 
@@ -41,7 +41,7 @@ CBGame.Gameplay.prototype = {
         this.loadMapObjects(objects);
 
         // Time limit
-        this.stageTime = 10;
+        this.stageTime = 300;
         this.stageTimeCounter = this.game.time.create();
 		this.stageTimeCounter.loop(1000, this.onStageTimerCounter, this);
 		this.stageTimeCounter.start();
@@ -55,11 +55,11 @@ CBGame.Gameplay.prototype = {
 			"Œ" + CBGame.Utils.pad(CBGame.Data.lives, 2), true);
 		this.timerLabel = this.renderText(88, 137, "T" + CBGame.Utils.pad(this.stageTime, 3), true);
 
-        cursors = this.input.keyboard.createCursorKeys();
+        this.debugNextLevel = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
 	},
 
 	update: function() {
-		
+
 		this.player.beforeUpdate();
 
 		if (this.player.isAlive) {
@@ -74,6 +74,8 @@ CBGame.Gameplay.prototype = {
 		this.physics.arcade.collide(this.bombs, this.ground);
 		// this.physics.arcade.overlap(this.bombs, this.explosions, CBGame.Bomb.onHitExplosion, null);
 		
+		if (this.door)
+			this.door.onUpdate();
 
 		this.player.onUpdate();	
 
@@ -84,6 +86,10 @@ CBGame.Gameplay.prototype = {
 		for (var i = 0; i < this.explosions.children.length; i++) {
 			if (this.explosions.getAt(i).wrappedBy)
 				this.explosions.getAt(i).wrappedBy.onUpdate();
+		}
+
+		if (this.debugNextLevel.justPressed()) {
+			CBGame.Data.nextLevel(this);
 		}
 	},
 
@@ -102,7 +108,7 @@ CBGame.Gameplay.prototype = {
 	},
 
 	loadMapObjects: function(objects) {
-		for (var index in objects) {
+		for (var index = objects.length-1; index >= 0; index--) {
 			var o = objects[index];
 			switch (o.name) {
 				case "Cat":
@@ -143,6 +149,10 @@ CBGame.Gameplay.prototype = {
 					fire.body.customSeparateX = true;
 					fire.body.customSeparateY = true;
 					break;
+				case "Door":
+					var door = new CBGame.Door(o.x, o.y, this.world, this);
+					this.door = door;
+					break;
 			}
         }
 	},
@@ -155,6 +165,10 @@ CBGame.Gameplay.prototype = {
 		} else {
 			this.timerLabel.text = "T"+CBGame.Utils.pad(this.stageTime,3);
 		}
+	},
+
+	onStageExit: function() {
+		CBGame.Data.nextLevel(this);
 	},
 
 	renderText: function(x, y, string, fixedToCamera) {

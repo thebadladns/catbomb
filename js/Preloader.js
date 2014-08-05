@@ -7,11 +7,33 @@ CBGame.Data = {
 	lives: 5,
 	continues: 2,
 
+	/*LEVELS: 4,
+	WORLDS: 4,*/
+	LEVELS: 2,
+	WORLDS: 1,
+
 	reset: function() {
 		this.level = 1;
 		this.world = 1;
 		this.lives = 5;
 		this.continues = 2;
+	},
+
+	nextLevel: function(scene) {
+		this.level++;
+		if (this.level > this.LEVELS) {
+			this.world++;
+			if (this.world > this.WORLDS) {
+				// win!
+				scene.game.state.start("GameOver");
+				return;
+			} else {
+				// next world
+				this.level = 1;
+			}
+		}
+
+		scene.game.state.start("PreGameplay");
 	}
 };
 
@@ -40,17 +62,29 @@ CBGame.Preloader.prototype = {
 		// Load assets for the game here...
 		// this.load.atlas('spriteset', 'assets/spritesheet.png', 'assets/spritesheet.json');
 
+		// Images
 		this.load.image('logo', 'assets/dummy.png');
 		this.load.image('title', 'assets/titletemp.png');
 		this.load.image('gameover', 'assets/gameovertemp.png');
 		this.load.image('hud', 'assets/hud.png');
+
+		// Tiles
 		this.load.image('basic', 'assets/tilesbasic.png');
-		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
+
+		// Levels
+		this.load.tilemap('stage1-1', 'assets/levelt2.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-2', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
+
+		// Sprites
 		this.load.image('ground', 'assets/ground.png');
 		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
 		this.load.spritesheet('bomb', 'assets/bomb.png', 20, 20);
 		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
 		this.load.spritesheet('explosion', 'assets/boom.png', 32, 32);
+		this.load.spritesheet('door', 'assets/door.png', 24, 24);
+
+		// Sounds!!
+		// ...
 	},
 
 	create: function() {		

@@ -43,6 +43,7 @@ CBGame.Preloader.prototype = {
 		this.load.image('logo', 'assets/dummy.png');
 		this.load.image('title', 'assets/titletemp.png');
 		this.load.image('gameover', 'assets/gameovertemp.png');
+		this.load.image('hud', 'assets/hud.png');
 		this.load.image('basic', 'assets/tilesbasic.png');
 		this.load.tilemap('mapLevel0', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
 		this.load.image('ground', 'assets/ground.png');

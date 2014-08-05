@@ -273,6 +273,18 @@ CBGame.Cat.prototype = {
 		}
 	},
 
+	onTimeout: function() {
+		// Kill cat!
+		if (this.isAlive) {
+			console.log("death by timeout");
+			this.isAlive = false;
+			this.justDead = true;
+
+			this.storedVelocityX = 0;
+			this.storedVelocityY = -70;
+		}
+	},
+
 	onDeath: function() {
 		CBGame.Data.lives -= 1;
 		if (CBGame.Data.lives < 0) {

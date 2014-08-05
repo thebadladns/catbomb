@@ -40,6 +40,12 @@ CBGame.Gameplay.prototype = {
         var objects = map.objects['Object Layer 1'];
         this.loadMapObjects(objects);
 
+        // Fix order
+        this.world.sendToBack(this.door);
+        this.world.bringToTop(this.bombs);
+        this.world.bringToTop(this.player);
+        this.world.bringToTop(this.explosions);
+
         // Time limit
         this.stageTime = 300;
         this.stageTimeCounter = this.game.time.create();
@@ -69,10 +75,10 @@ CBGame.Gameplay.prototype = {
 			this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
 			this.physics.arcade.collide(this.player.self, this.bombs);
 			this.physics.arcade.overlap(this.player.self, this.explosions, this.player.onHitExplosion, null, this.player);
+			this.physics.arcade.overlap(this.player.self, this.door.self, this.player.onDoor, null, this.player);		
 		}
 
 		this.physics.arcade.collide(this.bombs, this.ground);
-		// this.physics.arcade.overlap(this.bombs, this.explosions, CBGame.Bomb.onHitExplosion, null);
 		
 		if (this.door)
 			this.door.onUpdate();
@@ -104,7 +110,8 @@ CBGame.Gameplay.prototype = {
 		/*for (var i = 0; i < this.bombs.children.length; i++)
 			this.game.debug.body(this.bombs.children[i]);*/
 		/*for (var i = 0; i < this.explosions.children.length; i++)
-			this.game.debug.body(this.explosions.children[i]);*/
+			this.game.debug.body(this.explosions.children[i]);
+		this.game.debug.body(this.door.self);*/
 	},
 
 	loadMapObjects: function(objects) {
@@ -150,7 +157,8 @@ CBGame.Gameplay.prototype = {
 					fire.body.customSeparateY = true;
 					break;
 				case "Door":
-					var door = new CBGame.Door(o.x, o.y, this.world, this);
+					var door = new CBGame.Door(o.x, o.y, this.game, this);
+					door.onCreate();
 					this.door = door;
 					break;
 			}

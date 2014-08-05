@@ -8,6 +8,9 @@ CBGame.Bomb = function(x, y, game, scene, config) {
 
 	this.self.state = parseInt(config.state);
 	this.timer = null;
+
+	this.self.inputEnabled = true;
+    this.self.input.enableDrag();
 }
 
 CBGame.Bomb.prototype = {
@@ -24,7 +27,7 @@ CBGame.Bomb.prototype = {
         this.self.body.immovable = true;
         this.self.body.gravity.y = 300;
         this.self.body.center.setTo(8, 8);
-        this.self.body.setSize(16, 12, 0, 8);
+        this.self.body.setSize(12, 12, 2, 8);
         this.self.body.collideWithBounds = true;
         this.self.body.checkCollision.left = false;
         this.self.body.checkCollision.right = false;
@@ -58,7 +61,7 @@ CBGame.Bomb.prototype = {
 
 			// Check for explosions!
 			var es = this.scene.explosions;
-			for (var i = 0; i < fs.length; i++) {
+			for (var i = 0; i < es.length; i++) {
 				var e = es.getAt(i);
 				if (!e || !e.body)
 					continue;
@@ -142,12 +145,12 @@ CBGame.Door.prototype = {
 		this.self.animations.add('closed', [0], 15, true);
 		this.self.animations.add('open', [1], 15, true);
 		this.self.name = "Door";
+		this.game.physics.arcade.enable(this.self);
         this.self.body.immovable = true;
         this.self.body.customSeparateX = true;
         this.self.body.customSeparateY = true;
         this.self.body.setSize(20, 20, 2, 4);
-        this.self.z = asd1000; // !!!!
-        // Z! depth! back!
+        this.self.move
         this.state = this.CLOSED;
 	},
 
@@ -158,6 +161,18 @@ CBGame.Door.prototype = {
 	onUpdate: function() {
 		switch (this.state) {
 			case this.CLOSED:
+				// Check for explosions!
+				var es = this.scene.explosions;
+				for (var i = 0; i < es.length; i++) {
+					var e = es.getAt(i);
+					if (!e || !e.body)
+						continue;
+					if (this.game.physics.arcade.intersects(this.self.body, e.body)) {
+						this.onHitExplosion();
+						break;
+					}
+				}
+
 				this.self.animations.play('closed');
 				break;
 			case this.OPEN:
@@ -168,5 +183,11 @@ CBGame.Door.prototype = {
 
 	onRender: function() {	
 
+	},
+
+	onHitExplosion: function(me, explosion) {
+		// Effects!
+		if (this.state == this.CLOSED)
+			this.state = this.OPEN;
 	}
 }

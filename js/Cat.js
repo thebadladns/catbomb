@@ -45,6 +45,7 @@ CBGame.Cat.prototype = {
 
 		this.isAlive = true;
         this.facing = this.RIGHT;
+        this.self.onOpenDoor = false;
         this.carrying = {
         	type: this.TYPE_NONE,
         	reference: null
@@ -54,6 +55,7 @@ CBGame.Cat.prototype = {
 	beforeUpdate: function() {
 		if (this.isAlive) {
 			this.self.onLadder = false;
+			this.self.onOpenDoor = false;
 			this.self.body.velocity.x = 0;
 			/*if (this.carrying.type != this.TYPE_NONE) {
 				this.carrying.reference.body.velocity.x = 0;
@@ -73,7 +75,10 @@ CBGame.Cat.prototype = {
 				this.self.tint = 0xffffff;*/
 
 			if (!this.self.climbing && this.self.body.velocity.y == 0) {
-				if (this.cursors.left.isDown) {
+				if (this.self.onOpenDoor && this.cursors.up.justPressed()) {
+					// Exit!
+					CBGame.Data.nextLevel(this.scene);
+				} else if (this.cursors.left.isDown) {
 					this.self.body.velocity.x = -60;
 					this.self.animations.play('left');
 					this.facing = this.LEFT;
@@ -199,6 +204,15 @@ CBGame.Cat.prototype = {
 		if (Math.abs(ladder.x + ladder.body.offset.x - (this.self.x + this.self.width/2)) < 2) {
 			this.self.onLadder = true;
 			this.self.currentLadder = ladder;
+		}
+	},
+
+	onDoor: function(me, door) {
+		this.self.onOpenDoor = false;
+		if (door.wrappedBy.state == CBGame.Door.prototype.OPEN) {
+			if (Math.abs(door.x + door.width/2 - (this.self.x + this.self.width/2)) < 8) {
+				this.self.onOpenDoor = true;
+			}
 		}
 	},
 

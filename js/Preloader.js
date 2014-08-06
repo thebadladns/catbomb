@@ -9,7 +9,7 @@ CBGame.Data = {
 
 	/*LEVELS: 4,
 	WORLDS: 4,*/
-	LEVELS: 2,
+	LEVELS: 4,
 	WORLDS: 1,
 
 	reset: function() {
@@ -80,9 +80,10 @@ CBGame.Preloader.prototype = {
 		this.load.image('basic', 'assets/tilesbasic.png');
 
 		// Levels
-		this.load.tilemap('stage1-1', 'assets/levelt1.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-2', 'assets/levelt2.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-3', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-1', 'assets/levelt3.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-2', 'assets/levelt1.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-3', 'assets/levelt2.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-4', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
 
 		// Sprites
 		this.load.image('ground', 'assets/ground.png');

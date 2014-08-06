@@ -34,15 +34,21 @@ CBGame.Cat.prototype = {
 	TYPE_BOMB: 1,
 	TYPE_KEY: 2,
 
+	GRAVITY: 300,
+	HSPEED: 40,
+	VSPEED: 1,
+
+
 	onCreate: function() {
 		this.self.animations.add('left', [2, 3], 3, true);
 		this.self.animations.add('walkleft', [2, 3], 6, true);
 		this.self.animations.add('right', [0, 1], 3, true);
 		this.self.animations.add('walkright', [0, 1], 6, true);
+		this.self.animations.add('climb', [6, 7], 4, true);
 		this.self.animations.add('dead', [4, 5], 4, true);
 
 		this.game.physics.arcade.enable(this.self);
-		this.self.body.gravity.y = 300;
+		this.self.body.gravity.y = this.GRAVITY;
 		this.self.body.center.setTo(8, 8);
 		this.self.body.setSize(14, 15, 1, 1);
 		this.self.body.collideWithBounds = true;
@@ -110,11 +116,11 @@ CBGame.Cat.prototype = {
 					// Exit!
 					CBGame.Data.nextLevel(this.scene);
 				} else if (this.cursors.left.isDown) {
-					this.self.body.velocity.x = -60;
+					this.self.body.velocity.x = -this.HSPEED;
 					anim = 'walkleft';
 					this.facing = this.LEFT;
 				} else if (this.cursors.right.isDown) {
-					this.self.body.velocity.x = 60;
+					this.self.body.velocity.x = this.HSPEED;
 					anim = 'walkright';
 					this.facing = this.RIGHT;
 				} else {
@@ -125,6 +131,8 @@ CBGame.Cat.prototype = {
 				}
 
 				this.self.animations.play(anim);
+			} else if (this.self.body.velocity.y != 0) {
+				this.self.animations.stop();
 			}
 
 			if (this.B.justPressed(1)) {
@@ -151,7 +159,7 @@ CBGame.Cat.prototype = {
 					// Make it solid
 					var bomb = this.carrying.reference;
 					bomb.body.immovable = true;
-					bomb.body.gravity.y = 300;
+					bomb.body.gravity.y = this.GRAVITY;
 					// Drop it
 					bomb.z = bomb.oldz;
 					bomb.y += 4;
@@ -176,25 +184,21 @@ CBGame.Cat.prototype = {
 				}
 			}
 
+			var oldY = this.self.y;
+
 			if (!this.self.onLadder) {
-				this.self.body.gravity.y = 300;
+				this.self.body.gravity.y = this.GRAVITY;
 				this.self.climbing = false;
 			} else if (this.self.onLadder && this.cursors.up.isDown) {
 				if (this.self.currentLadder.y < this.self.y + this.self.height - 1) {
 					this.self.x = this.self.currentLadder.x;
-					this.self.y -= 1;
+					this.self.y -= this.VSPEED;
 					this.self.body.gravity.y = 0;
 					this.self.climbing = true;
-					/*var anim = "";
-					if (this.facing == this.LEFT)
-						anim = "walkleft";
-					else
-						anim = "walkright";
-					this.self.animations.play(anim);*/
 				}
 			} else if (this.self.onLadder && this.cursors.down.isDown) {
 				if (!this.checkForFloor()) {
-					this.self.y += 1;
+					this.self.y += this.VSPEED;
 					this.self.body.gravity.y = 0;
 					this.self.x = this.self.currentLadder.x;
 					this.self.climbing = true;
@@ -204,9 +208,15 @@ CBGame.Cat.prototype = {
 			} else {
 				// If we are just on the top and not pressing buttons, just drop dude
 				if (this.self.currentLadder.y == this.self.y + this.self.height - 1) {
-					this.self.body.gravity.y = 300;
+					this.self.body.gravity.y = this.GRAVITY;
 					this.self.climbing = false;
 				}
+			}
+
+			if (this.self.climbing) {
+				this.self.animations.play("climb");
+				if (this.self.y == oldY)
+					this.self.animations.stop();
 			}
 
 		} else {
@@ -219,7 +229,7 @@ CBGame.Cat.prototype = {
 			}
 			this.self.body.acceleration.x = 
 				-1 * CBGame.Utils.sign(this.self.body.velocity.x) * 30;
-			this.self.body.gravity.y = 300;
+			this.self.body.gravity.y = this.GRAVITY;
 			this.self.animations.play('dead');
 
 			// Check out of bounds!

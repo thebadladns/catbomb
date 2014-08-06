@@ -127,11 +127,12 @@ CBGame.Gameplay.prototype = {
 				this.game.debug.body(this.ladders.children[i]);
 			for (var i = 0; i < this.oneways.children.length; i++)
 				this.game.debug.body(this.oneways.children[i]);
-
 			for (var i = 0; i < this.bombs.children.length; i++)
 				this.game.debug.body(this.bombs.children[i]);
 			for (var i = 0; i < this.explosions.children.length; i++)
 				this.game.debug.body(this.explosions.children[i]);
+			for (var i = 0; i < this.enemies.children.length; i++)
+				this.game.debug.body(this.enemies.children[i]);
 			this.game.debug.body(this.door.self);
 		}
 

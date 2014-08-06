@@ -35,8 +35,10 @@ CBGame.Cat.prototype = {
 	TYPE_KEY: 2,
 
 	onCreate: function() {
-		this.self.animations.add('left', [2, 3], 6, true);
-		this.self.animations.add('right', [0, 1], 6, true);
+		this.self.animations.add('left', [2, 3], 3, true);
+		this.self.animations.add('walkleft', [2, 3], 6, true);
+		this.self.animations.add('right', [0, 1], 3, true);
+		this.self.animations.add('walkright', [0, 1], 6, true);
 		this.self.animations.add('dead', [4, 5], 4, true);
 
 		this.game.physics.arcade.enable(this.self);
@@ -93,7 +95,7 @@ CBGame.Cat.prototype = {
 				this.self.tint = 0xffffff;*/
 
 			// Check for enemies!
-			var es = this.scene.enemies;
+			/*var es = this.scene.enemies;
 			for (var i = 0; i < es.length; i++) {
 				var e = es.getAt(i);
 				if (!e || !e.body)
@@ -102,35 +104,29 @@ CBGame.Cat.prototype = {
 					this.onHitEnemy(this.self, e);
 					break;
 				}
-			}
-
-			// Check for fire!
-			/*var fs = this.scene.fire;
-			for (var i = 0; i < fs.length; i++) {
-				var f = fs.getAt(i);
-				if (!f || !f.body)
-					continue;
-				if (this.game.physics.arcade.intersects(this.self.body, f.body)) {
-					this.onHitFire(this.self, e);
-					break;
-				}
 			}*/
 
 			if (!this.self.climbing && this.self.body.velocity.y == 0) {
+				var anim = "";
 				if (this.self.onOpenDoor && this.cursors.up.justPressed()) {
 					// Exit!
 					CBGame.Data.nextLevel(this.scene);
 				} else if (this.cursors.left.isDown) {
 					this.self.body.velocity.x = -60;
-					this.self.animations.play('left');
+					anim = 'walkleft';
 					this.facing = this.LEFT;
 				} else if (this.cursors.right.isDown) {
 					this.self.body.velocity.x = 60;
-					this.self.animations.play('right');
+					anim = 'walkright';
 					this.facing = this.RIGHT;
 				} else {
-					this.self.animations.stop();
+					if (this.facing == this.LEFT)
+						anim = "left";
+					else
+						anim = "right";
 				}
+
+				this.self.animations.play(anim);
 			}
 
 			if (this.B.justPressed(1)) {
@@ -191,6 +187,12 @@ CBGame.Cat.prototype = {
 					this.self.y -= 1;
 					this.self.body.gravity.y = 0;
 					this.self.climbing = true;
+					/*var anim = "";
+					if (this.facing == this.LEFT)
+						anim = "walkleft";
+					else
+						anim = "walkright";
+					this.self.animations.play(anim);*/
 				}
 			} else if (this.self.onLadder && this.cursors.down.isDown) {
 				if (!this.checkForFloor()) {

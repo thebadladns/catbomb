@@ -122,7 +122,8 @@ CBGame.Explosion = function(x, y, game, scene) {
 
 CBGame.Explosion.prototype = {
 	onCreate: function() {
-		this.self.animations.add('boom', [0,1,2,0], 15, false);
+		// this.self.animations.add('boom', [0,1,2,0], 15, false);
+		this.self.animations.add('boom', [0,1,2,3,4,5], 15, false);
 		this.self.body.immovable = true;
 		this.self.body.setSize(30, 30, 1, 1);
 	},

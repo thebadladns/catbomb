@@ -26,5 +26,34 @@
   <object name="Door" type="Door" x="32" y="40" width="24" height="24"/>
   <object name="Cat" type="Cat" x="56" y="56"/>
   <object name="Walker" x="104" y="16"/>
+  <object name="Bomb" type="Bomb" x="56" y="120">
+   <properties>
+    <property name="active" value="0"/>
+   </properties>
+  </object>
+  <object name="Bomb" type="Bomb" x="24" y="120">
+   <properties>
+    <property name="active" value="0"/>
+   </properties>
+  </object>
+  <object name="Bomb" type="Bomb" x="120" y="120">
+   <properties>
+    <property name="active" value="0"/>
+   </properties>
+  </object>
+  <object name="Bomb" type="Bomb" x="88" y="120">
+   <properties>
+    <property name="active" value="0"/>
+   </properties>
+  </object>
+  <object name="Bomb" type="Bomb" x="136" y="88">
+   <properties>
+    <property name="active" value="0"/>
+   </properties>
+  </object>
+  <object name="Fire" type="Fire" x="24" y="112" width="16" height="16"/>
+  <object name="Fire" type="Fire" x="56" y="112" width="16" height="16"/>
+  <object name="Fire" type="Fire" x="88" y="112" width="16" height="16"/>
+  <object name="Fire" type="Fire" x="120" y="112" width="16" height="16"/>
  </objectgroup>
 </map>

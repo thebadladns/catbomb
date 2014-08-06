@@ -89,7 +89,7 @@ CBGame.Preloader.prototype = {
 		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
 		this.load.spritesheet('bomb', 'assets/bomb.png', 20, 20);
 		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
-		this.load.spritesheet('explosion', 'assets/boom.png', 32, 32);
+		this.load.spritesheet('explosion', 'assets/boomv2.png', 32, 32);
 		this.load.spritesheet('door', 'assets/door.png', 24, 24);
 
 		this.load.spritesheet('skeleton', 'assets/skeleton.png', 16, 16);

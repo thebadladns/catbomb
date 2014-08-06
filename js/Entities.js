@@ -31,7 +31,16 @@ CBGame.Bomb.prototype = {
 		this.self.body.collideWithBounds = true;
 		this.self.body.checkCollision.left = false;
 		this.self.body.checkCollision.right = false;
-		this.self.body.bounce.y = 0.2;
+		this.self.body.bounce.y = 0.3;
+
+		// Spawn the oneway platform of the top
+		this.oneway = this.scene.oneways.create(this.self.x, this.self.y+8);
+		this.oneway.name = "onewaybomb";
+		this.oneway.body.setSize(12, 8);
+		this.oneway.body.immovable = true;
+		this.oneway.body.checkCollision.down = false;
+		this.oneway.body.checkCollision.right = false;
+		this.oneway.body.checkCollision.left = false;
 	},
 
 	beforeUpdate: function() {
@@ -78,6 +87,10 @@ CBGame.Bomb.prototype = {
 			this.self.body.bounce.y = 0.3;
 		}
 
+		this.oneway.x = this.self.x+2;
+		this.oneway.y = this.self.y+8;
+		
+
 		switch (this.self.state) {
 			case this.STATE_IDLE:
 				this.self.animations.play("idle");
@@ -95,6 +108,7 @@ CBGame.Bomb.prototype = {
 	onTimer: function(a, b, c) {
 		var boom = new CBGame.Explosion(this.self.x-8, this.self.y-4, this.game, this.scene);
 		boom.onCreate();
+		this.oneway.destroy();
 		this.self.destroy();
 	}
 }

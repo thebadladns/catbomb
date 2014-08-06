@@ -77,19 +77,23 @@ CBGame.Gameplay.prototype = {
 		if (this.player.isAlive) {
 			this.physics.arcade.collide(this.player.self, this.ground);
 			this.physics.arcade.collide(this.player.self, this.oneways);
-			this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
-			this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
-	this.physics.arcade.collide(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
 			this.physics.arcade.collide(this.player.self, this.bombs);
-			this.physics.arcade.overlap(this.player.self, this.explosions, this.player.onHitExplosion, null, this.player);
-			this.physics.arcade.overlap(this.player.self, this.door.self, this.player.onDoor, null, this.player);		
-	this.physics.arcade.overlap(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
+			this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);
+			
+			this.physics.arcade.overlap(this.player.self, this.door.self, this.player.onDoor, null, this.player);	
+			if (!this.player.DEBUG) {
+				this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
+				this.physics.arcade.overlap(this.player.self, this.fire, this.player.onHitFire, null, this.player);
+				this.physics.arcade.collide(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
+				this.physics.arcade.overlap(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
+				this.physics.arcade.overlap(this.player.self, this.explosions, this.player.onHitExplosion, null, this.player);
+			}
 		}
 
 		this.physics.arcade.collide(this.bombs, this.ground);
 		this.physics.arcade.collide(this.bombs, this.oneways);
-		this.physics.arcade.collide (this.enemies, this.ground);
-		this.physics.arcade.collide (this.enemies, this.oneways);
+		this.physics.arcade.collide(this.enemies, this.ground);
+		this.physics.arcade.collide(this.enemies, this.oneways);
 		
 		if (this.door)
 			this.door.onUpdate();
@@ -106,7 +110,7 @@ CBGame.Gameplay.prototype = {
 		}
 		
 		for (var i = 0; i < this.enemies.children.length; i++) {
-	this.enemies.getAt(i).wrappedBy.onUpdate();
+			this.enemies.getAt(i).wrappedBy.onUpdate();
 		}
 
 		if (this.debugNextLevel.justPressed()) {
@@ -116,24 +120,27 @@ CBGame.Gameplay.prototype = {
 
 	render: function() {
 	
+		if (this.player.DEBUG) {
+			this.player.onRender();
+
+			for (var i = 0; i < this.ladders.children.length; i++)
+				this.game.debug.body(this.ladders.children[i]);
+			for (var i = 0; i < this.oneways.children.length; i++)
+				this.game.debug.body(this.oneways.children[i]);
+
+			for (var i = 0; i < this.bombs.children.length; i++)
+				this.game.debug.body(this.bombs.children[i]);
+			for (var i = 0; i < this.explosions.children.length; i++)
+				this.game.debug.body(this.explosions.children[i]);
+			this.game.debug.body(this.door.self);
+		}
+
 		pixel.render();
-		
-		//this.player.onRender();
-
-		/*for (var i = 0; i < this.ladders.children.length; i++)
-			this.game.debug.body(this.ladders.children[i]);
-		for (var i = 0; i < this.oneways.children.length; i++)
-			this.game.debug.body(this.oneways.children[i]);*/
-
-		/*for (var i = 0; i < this.bombs.children.length; i++)
-			this.game.debug.body(this.bombs.children[i]);*/
-		/*for (var i = 0; i < this.explosions.children.length; i++)
-			this.game.debug.body(this.explosions.children[i]);
-		this.game.debug.body(this.door.self);*/
 	},
 
 	loadMapObjects: function(objects) {
-		for (var index = objects.length-1; index >= 0; index--) {
+		// for (var index = objects.length-1; index >= 0; index--) {
+		for (var index = 0; index <  objects.length; index++) {
 			var o = objects[index];
 			switch (o.name) {
 				case "Cat":
@@ -145,18 +152,18 @@ CBGame.Gameplay.prototype = {
 					// Spawn the ladder
 					var ladder = this.ladders.create(o.x, o.y-1);
 					ladder.name = "ladder" + index;
-					ladder.body.setSize(2, o.height+1, o.width/2-1);
+					ladder.body.setSize(6, o.height+1, o.width/2-3);
 					ladder.body.immovable = true;
-			ladder.body.customSeparateX = true;
-			ladder.body.customSeparateY = true;
-			// Spawn the oneway platform of the top
-			var oneway = this.oneways.create(o.x, o.y);
-			oneway.name = "oneway" + index;
-			oneway.body.setSize(o.width, 8);
-			oneway.body.immovable = true;
-			oneway.body.checkCollision.down = false;
-			oneway.body.checkCollision.right = false;
-			oneway.body.checkCollision.left = false;
+					ladder.body.customSeparateX = true;
+					ladder.body.customSeparateY = true;
+					// Spawn the oneway platform of the top
+					var oneway = this.oneways.create(o.x, o.y);
+					oneway.name = "oneway" + index;
+					oneway.body.setSize(o.width, 8);
+					oneway.body.immovable = true;
+					oneway.body.checkCollision.down = false;
+					oneway.body.checkCollision.right = false;
+					oneway.body.checkCollision.left = false;
 					break;
 				case "Bomb":
 					var bomb = new CBGame.Bomb(o.x, o.y, this.game, this, {
@@ -171,6 +178,7 @@ CBGame.Gameplay.prototype = {
 					fire.animations.add('idle', [0, 1], 4, true);
 					fire.animations.play('idle');
 					fire.name = "fire" + index;
+					fire.body.setSize(12, 15, 2, 1);
 					fire.body.customSeparateX = true;
 					fire.body.customSeparateY = true;
 					break;
@@ -178,10 +186,10 @@ CBGame.Gameplay.prototype = {
 					var door = new CBGame.Door(o.x, o.y, this.game, this);
 					door.onCreate();
 					this.door = door;
-			break;
-		case "Walker":
-			var enemy = new CBGame.EnemyWalker(o.x, o.y, this.game, this);
-			enemy.onCreate();
+					break;
+				case "Walker":
+					var enemy = new CBGame.EnemyWalker(o.x, o.y, this.game, this);
+					enemy.onCreate();
 					break;
 			}
 		}

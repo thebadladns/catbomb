@@ -58,9 +58,9 @@ CBGame.Cat.prototype = {
 
 	beforeUpdate: function() {
 		if (this.DEBUG) {
-	this.isAlive = true;
-	this.storedVelocityX = 0;
-	this.storedVelocityY = 0;
+			this.isAlive = true;
+			this.storedVelocityX = 0;
+			this.storedVelocityY = 0;
 		}
 
 		if (this.isAlive) {
@@ -91,6 +91,30 @@ CBGame.Cat.prototype = {
 				this.self.tint = 0x9a058c;
 			else
 				this.self.tint = 0xffffff;*/
+
+			// Check for enemies!
+			var es = this.scene.enemies;
+			for (var i = 0; i < es.length; i++) {
+				var e = es.getAt(i);
+				if (!e || !e.body)
+					continue;
+				if (this.game.physics.arcade.intersects(this.self.body, e.body)) {
+					this.onHitEnemy(this.self, e);
+					break;
+				}
+			}
+
+			// Check for fire!
+			/*var fs = this.scene.fire;
+			for (var i = 0; i < fs.length; i++) {
+				var f = fs.getAt(i);
+				if (!f || !f.body)
+					continue;
+				if (this.game.physics.arcade.intersects(this.self.body, f.body)) {
+					this.onHitFire(this.self, e);
+					break;
+				}
+			}*/
 
 			if (!this.self.climbing && this.self.body.velocity.y == 0) {
 				if (this.self.onOpenDoor && this.cursors.up.justPressed()) {
@@ -162,10 +186,12 @@ CBGame.Cat.prototype = {
 				this.self.body.gravity.y = 300;
 				this.self.climbing = false;
 			} else if (this.self.onLadder && this.cursors.up.isDown) {
-				this.self.x = this.self.currentLadder.x;
-				this.self.y -= 1;
-				this.self.body.gravity.y = 0;
-				this.self.climbing = true;
+				if (this.self.currentLadder.y < this.self.y + this.self.height - 1) {
+					this.self.x = this.self.currentLadder.x;
+					this.self.y -= 1;
+					this.self.body.gravity.y = 0;
+					this.self.climbing = true;
+				}
 			} else if (this.self.onLadder && this.cursors.down.isDown) {
 				if (!this.checkForFloor()) {
 					this.self.y += 1;
@@ -173,6 +199,12 @@ CBGame.Cat.prototype = {
 					this.self.x = this.self.currentLadder.x;
 					this.self.climbing = true;
 				} else {
+					this.self.climbing = false;
+				}
+			} else {
+				// If we are just on the top and not pressing buttons, just drop dude
+				if (this.self.currentLadder.y == this.self.y + this.self.height - 1) {
+					this.self.body.gravity.y = 300;
 					this.self.climbing = false;
 				}
 			}
@@ -187,6 +219,7 @@ CBGame.Cat.prototype = {
 			}
 			this.self.body.acceleration.x = 
 				-1 * CBGame.Utils.sign(this.self.body.velocity.x) * 30;
+			this.self.body.gravity.y = 300;
 			this.self.animations.play('dead');
 
 			// Check out of bounds!
@@ -219,7 +252,7 @@ CBGame.Cat.prototype = {
 	},
 
 	onLadder: function(me, ladder) {
-		if (Math.abs(ladder.x + ladder.body.offset.x - (this.self.x + this.self.width/2)) < 2) {
+		if (Math.abs(ladder.x + ladder.body.offset.x - (this.self.x + this.self.width/2)) < ladder.width) {
 			this.self.onLadder = true;
 			this.self.currentLadder = ladder;
 		}
@@ -282,9 +315,9 @@ CBGame.Cat.prototype = {
 
 	onHitFire: function(me, fire) {
 		// Kill cat!
-		if (Math.abs(me.body.overlapX) < me.width / 4 &&
+		/*if (Math.abs(me.body.overlapX) < me.width / 4 &&
 			Math.abs(me.body.overlapY) < me.height/ 4)
-			return;
+			return;*/
 
 		if (this.isAlive) {
 			console.log("death by fire");
@@ -298,9 +331,9 @@ CBGame.Cat.prototype = {
 	
 	onHitEnemy: function(me, enemy) {
 		// Kill cat!
-		if (Math.abs(me.body.overlapX) < me.width / 4 &&
+		/*if (Math.abs(me.body.overlapX) < me.width / 4 &&
 			Math.abs(me.body.overlapY) < me.height/ 4)
-			return;
+			return;*/
 
 		if (this.isAlive) {
 			console.log("death by enemy");

@@ -48,8 +48,9 @@ CBGame.Preloader = function(game) {
 
 CBGame.Preloader.prototype = {
 	preload: function() {
-		// Hide un-scaled canvas
 		var game = this.game;
+
+		// Hide un-scaled canvas
 		game.canvas.style['display'] = 'none';
 		
 		// Create a scaled canvas
@@ -63,14 +64,6 @@ CBGame.Preloader.prototype = {
 		
 		pixel.width = pixel.canvas.width;
 		pixel.height = pixel.canvas.height;
-		
-		/*this.scale.maxWidth = 160/**3* /;
-		this.scale.maxHeight = 144/**3* /;
-
-		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-		this.scale.setScreenSize();
-		*/
-		// this.stage.smoothed = false;
 
 		// SetBackground and preloadBar
 
@@ -87,8 +80,9 @@ CBGame.Preloader.prototype = {
 		this.load.image('basic', 'assets/tilesbasic.png');
 
 		// Levels
-		this.load.tilemap('stage1-1', 'assets/levelt2.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-2', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-1', 'assets/levelt1.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-2', 'assets/levelt2.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-3', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
 
 		// Sprites
 		this.load.image('ground', 'assets/ground.png');
@@ -97,6 +91,9 @@ CBGame.Preloader.prototype = {
 		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
 		this.load.spritesheet('explosion', 'assets/boom.png', 32, 32);
 		this.load.spritesheet('door', 'assets/door.png', 24, 24);
+
+		this.load.spritesheet('skeleton', 'assets/skeleton.png', 16, 16);
+		this.load.spritesheet('dissolve', 'assets/dissolve.png', 16, 16);
 
 		// Sounds!!
 		// ...

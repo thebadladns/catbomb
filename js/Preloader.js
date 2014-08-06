@@ -48,14 +48,29 @@ CBGame.Preloader = function(game) {
 
 CBGame.Preloader.prototype = {
 	preload: function() {
+		// Hide un-scaled canvas
+		var game = this.game;
+		game.canvas.style['display'] = 'none';
+		
+		// Create a scaled canvas
+		pixel.canvas = Phaser.Canvas.create(game.width * pixel.scale, game.height * pixel.scale);
+		// Store context
+		pixel.context = pixel.canvas.getContext('2d');
+		// Add to canvas
+		Phaser.Canvas.addToDOM(pixel.canvas);
+		// Disable smoothing
+		Phaser.Canvas.setSmoothingEnabled(pixel.context, false);
+		
+		pixel.width = pixel.canvas.width;
+		pixel.height = pixel.canvas.height;
+		
+		/*this.scale.maxWidth = 160/**3* /;
+		this.scale.maxHeight = 144/**3* /;
 
-        this.scale.maxWidth = 160*3;
-        this.scale.maxHeight = 144*3;
-
-        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.scale.setScreenSize();
-
-        // this.stage.smoothed = false;
+		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		this.scale.setScreenSize();
+		*/
+		// this.stage.smoothed = false;
 
 		// SetBackground and preloadBar
 
@@ -96,5 +111,9 @@ CBGame.Preloader.prototype = {
 			this.ready = true;
 			this.state.start("Title");
 		}
+	},
+	
+	render: function() {
+		pixel.render();
 	}
 };

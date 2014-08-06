@@ -18,15 +18,15 @@ CBGame.TitleScreen.prototype = {
 	},
 
 	render: function() {
-
+		pixel.render();
 	},
 
 	// Remember to NOT copy this and generalize!!
 	renderText: function(x, y, string) {
 		var text = string.toUpperCase();
-    	var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
 
-    	this.add.text(x, y, text, style);
+		this.add.text(x, y, text, style);
 	}
 }
 
@@ -48,14 +48,14 @@ CBGame.GameOver.prototype = {
 	},
 
 	render: function() {
-
+		pixel.render();
 	},
 
 	// Remember to NOT copy this and generalize!!
 	renderText: function(x, y, string) {
 		var text = string.toUpperCase();
-    	var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
 
-    	this.add.text(x, y, text, style);
+		this.add.text(x, y, text, style);
 	}
 }

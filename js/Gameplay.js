@@ -10,58 +10,64 @@ CBGame.Gameplay.prototype = {
 
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 
-        map = this.add.tilemap('stage' + CBGame.Data.world + '-' + CBGame.Data.level);
-        map.addTilesetImage('basic');
-        layer = map.createLayer('Tile Layer 1');
-        layer.resizeWorld();
-        // layer.debug = true;
-
+		map = this.add.tilemap('stage' + CBGame.Data.world + '-' + CBGame.Data.level);
+		map.addTilesetImage('basic');
+		layer = map.createLayer('Tile Layer 1');
+		layer.resizeWorld();
+		// layer.debug = true;
+		
+		// Tile callbacks!
+		// map.setTileIndexCallback(32, this.hitSolidTile, this);
+		
 		this.ground = layer;
 		map.setCollision([32, 33], true, layer);
 		this.physics.arcade.enable(map);
-        
-        this.map = map;
+		
+		this.map = map;
 
-        this.physics.arcade.setBounds(map.x, map.y, map.width, map.height);
+		this.physics.arcade.setBounds(map.x, map.y, map.width, map.height);
 
-        // Load entities
-        this.player = undefined;
-        this.ladders = this.add.group();
-        this.ladders.enableBody = true;
-        this.oneways = this.add.group();
-        this.oneways.enableBody = true;
-        this.fire = this.add.group();
-        this.fire.enableBody = true;
-        this.bombs = this.add.group();
-        this.bombs.enableBody = true;
-        this.explosions = this.add.group();
-        this.explosions.enableBody = true;
+		// Load entities
+		this.player = undefined;
+		this.ladders = this.add.group();
+		this.ladders.enableBody = true;
+		this.oneways = this.add.group();
+		this.oneways.enableBody = true;
+		this.fire = this.add.group();
+		this.fire.enableBody = true;
+		this.bombs = this.add.group();
+		this.bombs.enableBody = true;
+		this.enemies = this.add.group();
+		this.enemies.enableBody = true;
+		this.explosions = this.add.group();
+		this.explosions.enableBody = true;
 
-        var objects = map.objects['Object Layer 1'];
-        this.loadMapObjects(objects);
+		var objects = map.objects['Object Layer 1'];
+		this.loadMapObjects(objects);
 
-        // Fix order
-        this.world.sendToBack(this.door);
-        this.world.bringToTop(this.bombs);
-        this.world.bringToTop(this.player);
-        this.world.bringToTop(this.explosions);
+		// Fix order
+		this.world.sendToBack(this.door);
+		this.world.bringToTop(this.bombs);
+		this.world.bringToTop(this.enemies);
+		this.world.bringToTop(this.player);
+		this.world.bringToTop(this.explosions);
 
-        // Time limit
-        this.stageTime = 300;
-        this.stageTimeCounter = this.game.time.create();
+		// Time limit
+		this.stageTime = 300;
+		this.stageTimeCounter = this.game.time.create();
 		this.stageTimeCounter.loop(1000, this.onStageTimerCounter, this);
 		this.stageTimeCounter.start();
 
-        // HUD
-        this.hud = this.add.image(0, 136, "hud");
-        this.hud.fixedToCamera = true;
+		// HUD
+		this.hud = this.add.image(0, 136, "hud");
+		this.hud.fixedToCamera = true;
 		this.stageLabel = this.renderText(0, 137, "STAGE " + 
 			CBGame.Data.world + "-" + CBGame.Data.level, true);
 		this.livesLabel = this.renderText(136, 137, 
 			"Œ" + CBGame.Utils.pad(CBGame.Data.lives, 2), true);
 		this.timerLabel = this.renderText(88, 137, "T" + CBGame.Utils.pad(this.stageTime, 3), true);
 
-        this.debugNextLevel = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
+		this.debugNextLevel = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
 	},
 
 	update: function() {
@@ -73,12 +79,17 @@ CBGame.Gameplay.prototype = {
 			this.physics.arcade.collide(this.player.self, this.oneways);
 			this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);		
 			this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
+	this.physics.arcade.collide(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
 			this.physics.arcade.collide(this.player.self, this.bombs);
 			this.physics.arcade.overlap(this.player.self, this.explosions, this.player.onHitExplosion, null, this.player);
 			this.physics.arcade.overlap(this.player.self, this.door.self, this.player.onDoor, null, this.player);		
+	this.physics.arcade.overlap(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
 		}
 
 		this.physics.arcade.collide(this.bombs, this.ground);
+		this.physics.arcade.collide(this.bombs, this.oneways);
+		this.physics.arcade.collide (this.enemies, this.ground);
+		this.physics.arcade.collide (this.enemies, this.oneways);
 		
 		if (this.door)
 			this.door.onUpdate();
@@ -93,6 +104,10 @@ CBGame.Gameplay.prototype = {
 			if (this.explosions.getAt(i).wrappedBy)
 				this.explosions.getAt(i).wrappedBy.onUpdate();
 		}
+		
+		for (var i = 0; i < this.enemies.children.length; i++) {
+	this.enemies.getAt(i).wrappedBy.onUpdate();
+		}
 
 		if (this.debugNextLevel.justPressed()) {
 			CBGame.Data.nextLevel(this);
@@ -100,6 +115,9 @@ CBGame.Gameplay.prototype = {
 	},
 
 	render: function() {
+	
+		pixel.render();
+		
 		//this.player.onRender();
 
 		/*for (var i = 0; i < this.ladders.children.length; i++)
@@ -129,16 +147,16 @@ CBGame.Gameplay.prototype = {
 					ladder.name = "ladder" + index;
 					ladder.body.setSize(2, o.height+1, o.width/2-1);
 					ladder.body.immovable = true;
-		            ladder.body.customSeparateX = true;
-		            ladder.body.customSeparateY = true;
-		            // Spawn the oneway platform of the top
-		            var oneway = this.oneways.create(o.x, o.y);
-		            oneway.name = "oneway" + index;
-		            oneway.body.setSize(o.width, 8);
-		            oneway.body.immovable = true;
-		            oneway.body.checkCollision.down = false;
-		            oneway.body.checkCollision.right = false;
-		            oneway.body.checkCollision.left = false;
+			ladder.body.customSeparateX = true;
+			ladder.body.customSeparateY = true;
+			// Spawn the oneway platform of the top
+			var oneway = this.oneways.create(o.x, o.y);
+			oneway.name = "oneway" + index;
+			oneway.body.setSize(o.width, 8);
+			oneway.body.immovable = true;
+			oneway.body.checkCollision.down = false;
+			oneway.body.checkCollision.right = false;
+			oneway.body.checkCollision.left = false;
 					break;
 				case "Bomb":
 					var bomb = new CBGame.Bomb(o.x, o.y, this.game, this, {
@@ -160,9 +178,13 @@ CBGame.Gameplay.prototype = {
 					var door = new CBGame.Door(o.x, o.y, this.game, this);
 					door.onCreate();
 					this.door = door;
+			break;
+		case "Walker":
+			var enemy = new CBGame.EnemyWalker(o.x, o.y, this.game, this);
+			enemy.onCreate();
 					break;
 			}
-        }
+		}
 	},
 
 	onStageTimerCounter: function(a, b, c) {
@@ -178,14 +200,14 @@ CBGame.Gameplay.prototype = {
 	onStageExit: function() {
 		CBGame.Data.nextLevel(this);
 	},
-
+	
 	renderText: function(x, y, string, fixedToCamera) {
 		var text = string.toUpperCase();
-    	var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
 
-    	var text = this.add.text(x, y, text, style);
-    	text.fixedToCamera = fixedToCamera;
-    	return text;
+		var text = this.add.text(x, y, text, style);
+		text.fixedToCamera = fixedToCamera;
+		return text;
 	}
 }
 
@@ -213,14 +235,14 @@ CBGame.PreGameplay.prototype = {
 	},
 
 	render: function() {
-
+		pixel.render();
 	},
 
 	// Remember to NOT copy this and generalize!!
 	renderText: function(x, y, string) {
 		var text = string.toUpperCase();
-    	var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
 
-    	this.add.text(x, y, text, style);
+		this.add.text(x, y, text, style);
 	}
 };

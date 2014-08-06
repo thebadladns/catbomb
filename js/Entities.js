@@ -10,7 +10,7 @@ CBGame.Bomb = function(x, y, game, scene, config) {
 	this.timer = null;
 
 	this.self.inputEnabled = true;
-    this.self.input.enableDrag();
+	this.self.input.enableDrag();
 }
 
 CBGame.Bomb.prototype = {
@@ -21,17 +21,17 @@ CBGame.Bomb.prototype = {
 
 	onCreate: function() {
 		this.self.animations.add('idle', [0], 1, true);
-        this.self.animations.add('active', [1, 2], 3, true);
+		this.self.animations.add('active', [1, 2], 3, true);
 
-        this.game.physics.arcade.enable(this.self);
-        this.self.body.immovable = true;
-        this.self.body.gravity.y = 300;
-        this.self.body.center.setTo(8, 8);
-        this.self.body.setSize(12, 12, 2, 8);
-        this.self.body.collideWithBounds = true;
-        this.self.body.checkCollision.left = false;
-        this.self.body.checkCollision.right = false;
-        this.self.body.bounce.y = 0.2;
+		this.game.physics.arcade.enable(this.self);
+		this.self.body.immovable = true;
+		this.self.body.gravity.y = 300;
+		this.self.body.center.setTo(8, 8);
+		this.self.body.setSize(12, 12, 2, 8);
+		this.self.body.collideWithBounds = true;
+		this.self.body.checkCollision.left = false;
+		this.self.body.checkCollision.right = false;
+		this.self.body.bounce.y = 0.2;
 	},
 
 	beforeUpdate: function() {
@@ -109,8 +109,8 @@ CBGame.Explosion = function(x, y, game, scene) {
 CBGame.Explosion.prototype = {
 	onCreate: function() {
 		this.self.animations.add('boom', [0,1,2,0], 15, false);
-        this.self.body.immovable = true;
-        this.self.body.setSize(30, 30, 1, 1);
+		this.self.body.immovable = true;
+		this.self.body.setSize(30, 30, 1, 1);
 	},
 
 	beforeUpdate: function() {
@@ -146,12 +146,12 @@ CBGame.Door.prototype = {
 		this.self.animations.add('open', [1], 15, true);
 		this.self.name = "Door";
 		this.game.physics.arcade.enable(this.self);
-        this.self.body.immovable = true;
-        this.self.body.customSeparateX = true;
-        this.self.body.customSeparateY = true;
-        this.self.body.setSize(20, 20, 2, 4);
-        this.self.move
-        this.state = this.CLOSED;
+		this.self.body.immovable = true;
+		this.self.body.customSeparateX = true;
+		this.self.body.customSeparateY = true;
+		this.self.body.setSize(20, 20, 2, 4);
+		this.self.move
+		this.state = this.CLOSED;
 	},
 
 	beforeUpdate: function() {

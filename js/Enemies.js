@@ -12,8 +12,14 @@ CBGame.EnemyWalker.prototype = {
 	LEFT: -1,
 	RIGHT: 1,
 	
-	speed: 30,
+	speed: 25,
 	
+	STATE_WALK: 0,
+	STATE_CLIMB: 1,
+	UP: -1,
+	NONE: 0,
+	DOWN: 1,
+
 	onCreate: function() {
 		this.self.animations.add('left', [2, 3], 2, true);
 		this.self.animations.add('walkleft', [2, 3], 4, true);
@@ -27,25 +33,25 @@ CBGame.EnemyWalker.prototype = {
 		this.self.body.customSeparateX = true;
 	
 		this.facing = this.RIGHT;
+		this.state = this.STATE_WALK;
+		this.self.onLadder = false;
+		this.self.currentLadder = undefined;
+		this.self.climbing = this.NONE;
+
+		// Avoid climbing just as level starts
+		this.endClimb();
 
 		this.KILLME = this.game.input.keyboard.addKey(Phaser.Keyboard.K);
 	},
 	
 	beforeUpdate: function() {
+		this.self.onLadder = false;
+		this.self.body.velocity.x = 0;
 	},
 	
 	onUpdate: function() {
 		if (this.KILLME.justPressed()) 
 			this.onDeath();
-
-		// Walk forward until you fall
-		if (this.self.body.velocity.y == 0) {
-			if (this.self.body.onWall())
-				this.onHitWall();
-			this.self.body.velocity.x = this.facing * this.speed;
-		} else {
-			this.self.body.velocity.x = 0;
-		}
 
 		// Check for explosions!
 		var es = this.scene.explosions;
@@ -58,18 +64,95 @@ CBGame.EnemyWalker.prototype = {
 				break;
 			}
 		}
+
+		// Check for ladders!
+		var ls = this.scene.ladders;
+		for (var i = 0; i < ls.length; i++) {
+			var l = ls.getAt(i);
+			if (!l || !l.body)
+				continue;
+			if (this.game.physics.arcade.intersects(this.self.body, l.body)) {
+				this.onLadder(this, l);
+				break;
+			}
+		}
+
+		if (this.state == this.STATE_WALK) {
+			this.self.body.gravity.y = 300;
+
+			// Do we climb that stair??
+			if (this.self.onLadder && Math.random() < 1 && !this.justClimbed) {
+				// We are up, go down
+				this.state = this.STATE_CLIMB;
+				if (this.self.currentLadder.y == this.self.y + this.self.height - 1) {
+					this.climbing = this.DOWN;
+				} else {
+					this.climbing = this.UP;
+				}
+			}
+
+			// Walk forward until you fall
+			if (this.self.body.velocity.y == 0) {
+				if (this.self.body.onWall())
+					this.onHitWall();
+				this.self.body.velocity.x = this.facing * this.speed;
+			} else {
+				this.self.body.velocity.x = 0;
+			}
+
+			var anim = "";
+			if (this.self.body.velocity.x != 0)
+				anim = "walk";
+			if (this.facing == this.RIGHT)
+				anim += "right";
+			else
+				anim += "left";
+		} else if (this.state == this.STATE_CLIMB) {
+			this.self.body.gravity.y = 0;
+			this.self.body.velocity.x = 0;
+			this.self.body.velocity.y = 0;
+			if (this.self.onLadder && this.climbing != this.NONE) {
+				var ladder = this.self.currentLadder;
+				if (this.climbing == this.UP) {
+					if (Math.abs(this.self.currentLadder.y - 
+						(this.self.y + this.self.height - 1)) <= 1) {
+						this.endClimb();
+					} else {
+						this.self.y -= 0.5;
+					}
+				} else {
+					if (Math.abs(ladder.y + ladder.height - 
+						(this.self.y + this.self.height)) <= 1)
+						this.endClimb();
+					else
+						this.self.y += 0.5;
+				}
+			} else {
+				this.endClimb();
+			}
+		}
 		
-		var anim = "";
-		if (this.self.body.velocity.x != 0)
-			anim = "walk";
-		if (this.facing == this.RIGHT)
-			anim += "right";
+
+		/*if (this.self.onLadder)
+			this.self.tint = 0x02d3a0;
 		else
-			anim += "left";
+			this.self.tint = 0xffffff;*/
 
 		this.self.animations.play(anim);
 	},
 	
+	endClimb: function() {
+		this.state = this.STATE_WALK;
+		this.justClimbed = true;
+		var timer = timer = this.game.time.create(true);
+		timer.add(500, this.onTimer, this);
+		timer.start();
+	},
+
+	onTimer: function() {
+		this.justClimbed = false;
+	},
+
 	onRender: function() {
 	},
 	
@@ -79,6 +162,13 @@ CBGame.EnemyWalker.prototype = {
 			that.facing = that.RIGHT;
 		else
 			that.facing = that.LEFT;
+	},
+
+	onLadder: function(me, ladder) {
+		if (Math.abs(ladder.x - this.self.x) <= 1) {
+			this.self.onLadder = true;
+			this.self.currentLadder = ladder;
+		}
 	},
 
 	onDeath: function() {

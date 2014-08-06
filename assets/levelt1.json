@@ -64,7 +64,7 @@
                  "type":"Fire",
                  "visible":true,
                  "width":16,
-                 "x":32,
+                 "x":72,
                  "y":80
                 }, 
                 {
@@ -90,8 +90,8 @@
                  "type":"Bomb",
                  "visible":true,
                  "width":0,
-                 "x":64,
-                 "y":88
+                 "x":24,
+                 "y":120
                 }, 
                 {
                  "height":32,
@@ -129,7 +129,7 @@
                  "type":"Cat",
                  "visible":true,
                  "width":0,
-                 "x":56,
+                 "x":16,
                  "y":56
                 }, 
                 {
@@ -155,112 +155,21 @@
                  "type":"Bomb",
                  "visible":true,
                  "width":0,
-                 "x":56,
-                 "y":120
-                }, 
-                {
-                 "height":0,
-                 "name":"Bomb",
-                 "properties":
-                    {
-                     "active":"0"
-                    },
-                 "type":"Bomb",
-                 "visible":true,
-                 "width":0,
-                 "x":24,
-                 "y":120
-                }, 
-                {
-                 "height":0,
-                 "name":"Bomb",
-                 "properties":
-                    {
-                     "active":"0"
-                    },
-                 "type":"Bomb",
-                 "visible":true,
-                 "width":0,
-                 "x":120,
-                 "y":120
-                }, 
-                {
-                 "height":0,
-                 "name":"Bomb",
-                 "properties":
-                    {
-                     "active":"0"
-                    },
-                 "type":"Bomb",
-                 "visible":true,
-                 "width":0,
-                 "x":88,
-                 "y":120
-                }, 
-                {
-                 "height":0,
-                 "name":"Bomb",
-                 "properties":
-                    {
-                     "active":"0"
-                    },
-                 "type":"Bomb",
-                 "visible":true,
-                 "width":0,
                  "x":136,
                  "y":88
                 }, 
                 {
-                 "height":16,
-                 "name":"Fire",
+                 "height":0,
+                 "name":"Walker",
                  "properties":
                     {
 
                     },
-                 "type":"Fire",
+                 "type":"",
                  "visible":true,
-                 "width":16,
-                 "x":24,
-                 "y":112
-                }, 
-                {
-                 "height":16,
-                 "name":"Fire",
-                 "properties":
-                    {
-
-                    },
-                 "type":"Fire",
-                 "visible":true,
-                 "width":16,
-                 "x":56,
-                 "y":112
-                }, 
-                {
-                 "height":16,
-                 "name":"Fire",
-                 "properties":
-                    {
-
-                    },
-                 "type":"Fire",
-                 "visible":true,
-                 "width":16,
-                 "x":88,
-                 "y":112
-                }, 
-                {
-                 "height":16,
-                 "name":"Fire",
-                 "properties":
-                    {
-
-                    },
-                 "type":"Fire",
-                 "visible":true,
-                 "width":16,
-                 "x":120,
-                 "y":112
+                 "width":0,
+                 "x":72,
+                 "y":120
                 }],
          "opacity":1,
          "type":"objectgroup",

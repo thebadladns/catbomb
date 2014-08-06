@@ -73,20 +73,30 @@ CBGame.Gameplay.prototype = {
 	update: function() {
 
 		this.player.beforeUpdate();
+		for (var i = 0; i < this.enemies.children.length; i++) {
+			this.enemies.getAt(i).wrappedBy.beforeUpdate();
+		}
 
 		if (this.player.isAlive) {
 			this.physics.arcade.collide(this.player.self, this.ground);
 			this.physics.arcade.collide(this.player.self, this.oneways);
 			this.physics.arcade.collide(this.player.self, this.bombs);
-			this.physics.arcade.overlap(this.player.self, this.ladders, this.player.onLadder, null, this.player);
-			
-			this.physics.arcade.overlap(this.player.self, this.door.self, this.player.onDoor, null, this.player);	
+			this.physics.arcade.overlap(this.player.self, this.ladders, 
+				this.player.onLadder, null, this.player);
+			this.physics.arcade.overlap(this.player.self, this.door.self, 
+				this.player.onDoor, null, this.player);
+
 			if (!this.player.DEBUG) {
-				this.physics.arcade.collide(this.player.self, this.fire, this.player.onHitFire, null, this.player);
-				this.physics.arcade.overlap(this.player.self, this.fire, this.player.onHitFire, null, this.player);
-				this.physics.arcade.collide(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
-				this.physics.arcade.overlap(this.player.self, this.enemies, this.player.onHitEnemy, null, this.player);
-				this.physics.arcade.overlap(this.player.self, this.explosions, this.player.onHitExplosion, null, this.player);
+				this.physics.arcade.collide(this.player.self, this.fire, 
+					this.player.onHitFire, null, this.player);
+				this.physics.arcade.overlap(this.player.self, this.fire, 
+					this.player.onHitFire, null, this.player);
+				this.physics.arcade.collide(this.player.self, this.enemies, 
+					this.player.onHitEnemy, null, this.player);
+				this.physics.arcade.overlap(this.player.self, this.enemies, 
+					this.player.onHitEnemy, null, this.player);
+				this.physics.arcade.overlap(this.player.self, this.explosions, 
+					this.player.onHitExplosion, null, this.player);
 			}
 		}
 

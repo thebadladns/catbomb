@@ -84,8 +84,6 @@ CBGame.Cat.prototype = {
 				this.self.tint = 0x02d3a0;
 			else
 				this.self.tint = 0xffffff;
-	
-		document.getElementById('label').textContent = this.facing;
 
 		if (this.isAlive) {
 

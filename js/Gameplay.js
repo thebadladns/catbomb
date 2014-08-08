@@ -45,6 +45,8 @@ CBGame.Gameplay.prototype = {
 		this.enemies.enableBody = true;
 		this.explosions = this.add.group();
 		this.explosions.enableBody = true;
+		this.stop = this.add.group();
+		this.stop.enableBody = true;
 
 		var objects = map.objects['Object Layer 1'];
 		this.loadMapObjects(objects);
@@ -58,7 +60,7 @@ CBGame.Gameplay.prototype = {
 		// this.world.bringToTop(this.player);
 		this.player.self.z = this.enemies.z + 1;
 		// this.world.bringToTop(this.explosions);
-		this.explosions.z = this.player.z + 1;
+		this.explosions.z = this.player.self.z + 1;
 
 		// Time limit
 		this.stageTime = 300;
@@ -89,6 +91,15 @@ CBGame.Gameplay.prototype = {
 		this.continueText.visible = false;
 		this.restartText.visible = false;
 		
+		var zz = this.explosions.z + 1;
+		this.hud.z = (zz++);
+		this.stageLabel.z = (zz++);
+		this.livesLabel.z = (zz++);
+		this.timerLabel.z = (zz++);
+		this.pauseText.z = (zz++);
+		this.pauseBack.z = (zz++);
+		this.continueText.z = (zz++);
+		this.restartText.z = (zz++);
 
 		this.StartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
 		this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -172,8 +183,9 @@ CBGame.Gameplay.prototype = {
 		this.physics.arcade.collide(this.enemies, this.ground);
 		this.physics.arcade.collide(this.enemies, this.oneways);
 		this.physics.arcade.collide(this.enemies, this.locks);
-		this.physics.arcade.collide(this.keys, this.ground);
-		this.physics.arcade.collide(this.keys, this.oneways);
+		this.physics.arcade.collide(this.enemies, this.stop, this.handleEnemyVsStop);
+		this.physics.arcade.collide(this.keys, this.ground, this.handeBombVsGround);
+		this.physics.arcade.collide(this.keys, this.oneways, this.handeBombVsGround);
 		
 		if (this.door)
 			this.door.onUpdate();
@@ -218,6 +230,8 @@ CBGame.Gameplay.prototype = {
 				this.game.debug.body(this.enemies.children[i]);
 			for (var i = 0; i < this.keys.children.length; i++)
 				this.game.debug.body(this.keys.children[i]);
+			for (var i = 0; i < this.stop.children.length; i++)
+				this.game.debug.body(this.stop.children[i]);
 			this.game.debug.body(this.door.self);
 		}
 
@@ -280,7 +294,7 @@ CBGame.Gameplay.prototype = {
 					key.onCreate();
 					break;
 				case "Lock":
-					var lock = this.locks.create(o.x, o.y, "skeleton");
+					var lock = this.locks.create(o.x, o.y, "lock");
 					lock.animations.add('idle', [0], 1, true);
 					lock.animations.play('idle');
 					lock.name = "lock"+index;
@@ -289,6 +303,12 @@ CBGame.Gameplay.prototype = {
 				case "Walker":
 					var enemy = new CBGame.EnemyWalker(o.x, o.y, this.game, this);
 					enemy.onCreate();
+					break;
+				case "Stop":
+					var stop = this.stop.create(o.x, o.y);
+					// stop.visible = false;
+					stop.body.setSize(o.width, o.height);
+					stop.body.immovable = true;
 					break;
 			}
 		}
@@ -309,10 +329,9 @@ CBGame.Gameplay.prototype = {
 	},
 	
 	renderText: function(x, y, string, fixedToCamera) {
-		var text = string.toUpperCase();
-		var style = { font: "8px Press Start, Monospace", fill: "#282828", align: "left" };
-
-		var text = this.add.text(x, y, text, style);
+		string = string.toUpperCase();
+		var text = this.add.bitmapText(x, y, 'font', string, 8);
+		text.setText(string);
 		text.fixedToCamera = fixedToCamera;
 		return text;
 	},
@@ -360,6 +379,15 @@ CBGame.Gameplay.prototype = {
 			return false;
 	},
 	
+	handleEnemyVsStop: function(enemy, stop) {
+		if (enemy.lastStop != stop) {
+			enemy.wrappedBy.onHitWall();
+			enemy.lastStop = stop;
+			var t = enemy.game.time.create(true);
+			t.add(5, function() {enemy.lastStop = undefined; console.log("yay")});
+		}
+	},
+
 	handleBombVsBomb: function(bomb1, bomb2) {
 		// Bouncy funkyness
 		/*if (bomb1 == bomb2)
@@ -423,10 +451,18 @@ CBGame.PreGameplay.prototype = {
 	},
 
 	// Remember to NOT copy this and generalize!!
-	renderText: function(x, y, string) {
+	renderTextOld: function(x, y, string) {
 		var text = string.toUpperCase();
 		var style = { font: "8px Press Start, Monospace", fill: "#282828", align: "left" };
 
 		this.add.text(x, y, text, style);
-	}
+	},
+
+	renderText: function(x, y, string, fixedToCamera) {
+		string = string.toUpperCase();
+		var text = this.add.bitmapText(x, y, 'font', string, 8);
+		text.setText(string);
+		text.fixedToCamera = fixedToCamera;
+		return text;
+	},
 };

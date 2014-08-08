@@ -253,21 +253,26 @@ CBGame.Door.prototype = {
 }
 
 CBGame.Key = function(x, y, game, scene, config) {
-	this.self = scene.add.sprite(x, y, 'dissolve');
+	this.self = scene.add.sprite(x, y, 'key');
 
 	this.self.wrappedBy = this;
 
 	this.game = game;
 	this.scene = scene;
 
+	this.facing = this.LEFT;
+
 	this.self.inputEnabled = true;
 	this.self.input.enableDrag();
 }
 
 CBGame.Key.prototype = {
+	LEFT: -1,
+	RIGHT: 1,
 	
 	onCreate: function() {
-		this.self.animations.add('idle', [0], 1, true);
+		this.self.animations.add('right', [0], 1, true);
+		this.self.animations.add('left', [1], 1, true);
 
 		this.self.oldUpdate = this.self.update;
 		this.self.update = function() {
@@ -286,7 +291,7 @@ CBGame.Key.prototype = {
 		this.self.body.bounce.y = 0.3;
 
 		// Spawn the oneway platform of the top
-		this.oneway = this.scene.oneways.create(this.self.x, this.self.y+8);
+		this.oneway = this.scene.oneways.create(this.self.x, this.self.y+10);
 		this.oneway.name = "onewaybomb";
 		this.oneway.body.setSize(14, 4);
 		this.oneway.body.immovable = true;
@@ -361,6 +366,8 @@ CBGame.Key.prototype = {
 			if (!l || !l.body)
 				continue;
 			if (this.game.physics.arcade.intersects(this.self.body, l.body)) {
+				var fx = new CBGame.DissolveFx(l.x, l.y, this.game, this.scene);
+				fx.onCreate();
 				l.destroy();
 				this.onOpenLock();
 				break;
@@ -374,16 +381,24 @@ CBGame.Key.prototype = {
 		}
 
 		this.oneway.x = this.self.x + 1;
-		this.oneway.y = this.self.y + 1;
+		this.oneway.y = this.self.y + 4;
+
+		if (this.self.body.velocity.y != 0 && this.self.body.velocity.x != 0)
+			this.self.body.acceleration.x = CBGame.Utils.sign(this.self.body.velocity.x)*-1*40;
+		else
+			this.self.body.acceleration.x = 0;
 		
-		this.self.animations.play("idle");
+		if (this.facing == this.LEFT)
+			this.self.animations.play("left");
+		else
+			this.self.animations.play("right");
 	},
 
 	onRender: function() {	
 
 	},
 	
-	onOpenLock: function() {
+	onOpenLock: function(lock) {
 		var fx = new CBGame.DissolveFx(this.self.x, this.self.y, this.game, this.scene);
 		fx.onCreate();
 		this.oneway.destroy();

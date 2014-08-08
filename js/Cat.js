@@ -249,6 +249,11 @@ CBGame.Cat.prototype = {
 					this.self.animations.stop();
 			}
 
+			if (this.carrying.type != this.TYPE_NONE) {
+				var bomb = this.carrying.reference;
+				bomb.wrappedBy.facing = this.facing;
+			}
+
 		} else {
 			// DEAD CAT!!
 			
@@ -290,6 +295,8 @@ CBGame.Cat.prototype = {
 			} else if (this.facing == this.RIGHT) {
 				bomb.x = this.self.x + xoffset;
 			}
+
+			bomb.wrappedBy.facing = this.facing;
 		}
 	},
 

@@ -79,14 +79,17 @@ CBGame.Preloader.prototype = {
 		this.load.image('gameover', 'assets/gameovertemp.png');
 		this.load.image('hud', 'assets/hud.png');
 
+		// Font
+		game.load.bitmapFont('font', 'assets/font.png', 'assets/font.xml');
+
 		// Tiles
 		this.load.image('basic', 'assets/tilesbasic.png');
 
 		// Levels
-		this.load.tilemap('stage1-1', 'assets/levelt3.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-2', 'assets/levelt1.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-3', 'assets/levelt2.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-4', 'assets/levelt0.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-1', 'assets/0.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-2', 'assets/1.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-3', 'assets/2.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-4', 'assets/3.json', null, Phaser.Tilemap.TILED_JSON);
 
 		// Sprites
 		this.load.image('ground', 'assets/ground.png');
@@ -95,6 +98,8 @@ CBGame.Preloader.prototype = {
 		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
 		this.load.spritesheet('explosion', 'assets/boomv2.png', 32, 32);
 		this.load.spritesheet('door', 'assets/door.png', 24, 24);
+		this.load.spritesheet('key', 'assets/key.png', 16, 16);
+		this.load.image('lock', 'assets/lock.png');
 
 		this.load.spritesheet('skeleton', 'assets/skeleton.png', 16, 16);
 		this.load.spritesheet('dissolve', 'assets/dissolve.png', 16, 16);

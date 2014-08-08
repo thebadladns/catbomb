@@ -32,7 +32,10 @@ CBGame.EnemyWalker.prototype = {
 		this.self.body.collideWithBounds = true;
 		this.self.body.customSeparateX = true;
 	
-		this.facing = this.RIGHT;
+		if (Math.random() < 0.5)
+			this.facing = this.RIGHT;
+		else
+			this.facing = this.LEFT;
 		this.state = this.STATE_WALK;
 		this.self.onLadder = false;
 		this.self.currentLadder = undefined;
@@ -111,7 +114,7 @@ CBGame.EnemyWalker.prototype = {
 			this.self.body.gravity.y = 300;
 
 			// Do we climb that stair??
-			if (this.self.onLadder && Math.random() < 1 && !this.justClimbed) {
+			if (this.self.onLadder && Math.random() < 0.3 && !this.justClimbed) {
 				// We are up, go down
 				this.state = this.STATE_CLIMB;
 				if (this.self.currentLadder.y == this.self.y + this.self.height - 1) {

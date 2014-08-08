@@ -22,11 +22,12 @@ CBGame.TitleScreen.prototype = {
 	},
 
 	// Remember to NOT copy this and generalize!!
-	renderText: function(x, y, string) {
-		var text = string.toUpperCase();
-		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
-
-		this.add.text(x, y, text, style);
+	renderText: function(x, y, string, fixedToCamera) {
+		string = string.toUpperCase();
+		var text = this.add.bitmapText(x, y, 'font', string, 8);
+		text.setText(string);
+		text.fixedToCamera = fixedToCamera;
+		return text;
 	}
 }
 
@@ -52,10 +53,11 @@ CBGame.GameOver.prototype = {
 	},
 
 	// Remember to NOT copy this and generalize!!
-	renderText: function(x, y, string) {
-		var text = string.toUpperCase();
-		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
-
-		this.add.text(x, y, text, style);
+	renderText: function(x, y, string, fixedToCamera) {
+		string = string.toUpperCase();
+		var text = this.add.bitmapText(x, y, 'font', string, 8);
+		text.setText(string);
+		text.fixedToCamera = fixedToCamera;
+		return text;
 	}
 }

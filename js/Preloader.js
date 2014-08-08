@@ -7,6 +7,8 @@ CBGame.Data = {
 	lives: 5,
 	continues: 2,
 
+	paused: false,
+	
 	/*LEVELS: 4,
 	WORLDS: 4,*/
 	LEVELS: 4,
@@ -17,6 +19,7 @@ CBGame.Data = {
 		this.world = 1;
 		this.lives = 5;
 		this.continues = 2;
+		this.paused = false;
 	},
 
 	nextLevel: function(scene) {

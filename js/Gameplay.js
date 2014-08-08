@@ -35,6 +35,10 @@ CBGame.Gameplay.prototype = {
 		this.oneways.enableBody = true;
 		this.fire = this.add.group();
 		this.fire.enableBody = true;
+		this.locks = this.add.group();
+		this.locks.enableBody = true;
+		this.keys = this.add.group();
+		this.keys.enableBody = true;
 		this.bombs = this.add.group();
 		this.bombs.enableBody = true;
 		this.enemies = this.add.group();
@@ -46,11 +50,15 @@ CBGame.Gameplay.prototype = {
 		this.loadMapObjects(objects);
 
 		// Fix order
-		this.world.sendToBack(this.door);
+		this.world.sendToBack(this.door.self);
+		this.world.sendToBack(this.ground);
 		this.world.bringToTop(this.bombs);
-		this.world.bringToTop(this.enemies);
-		this.world.bringToTop(this.player);
-		this.world.bringToTop(this.explosions);
+		// this.world.bringToTop(this.enemies);
+		this.enemies.z = this.bombs.z + 1;
+		// this.world.bringToTop(this.player);
+		this.player.self.z = this.enemies.z + 1;
+		// this.world.bringToTop(this.explosions);
+		this.explosions.z = this.player.z + 1;
 
 		// Time limit
 		this.stageTime = 300;
@@ -66,12 +74,68 @@ CBGame.Gameplay.prototype = {
 		this.livesLabel = this.renderText(136, 137, 
 			"Œ" + CBGame.Utils.pad(CBGame.Data.lives, 2), true);
 		this.timerLabel = this.renderText(88, 137, "T" + CBGame.Utils.pad(this.stageTime, 3), true);
+		
+		// Pause screen
+		this.pauseBack = this.add.sprite(32, 48, "hud");
+		this.pauseBack.fixedToCamera = true;
+		this.pauseBack.scale.x = 0.6;
+		this.pauseBack.scale.y = 6;
+		this.pauseText = this.renderText(40, 56, " - PAUSE! - ", true);
+		this.pauseText.visible = false;
+		this.pauseBack.visible = false;
+		this.pauseSelected = 0;
+		this.continueText = this.renderText(40, 72, "Œ CONTINUE", true);
+		this.restartText = this.renderText(40, 80, "  RESTART", true);
+		this.continueText.visible = false;
+		this.restartText.visible = false;
+		
 
+		this.StartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+		this.cursors = this.game.input.keyboard.createCursorKeys();
+		this.A = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
+		
 		this.debugNextLevel = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
+		
+		CBGame.Data.paused = false;
 	},
 
 	update: function() {
 
+		if (this.StartButton.justPressed(1)) {
+			CBGame.Data.paused = !CBGame.Data.paused;
+			if (CBGame.Data.paused) {
+				this.handlePause();
+			} else {
+				this.handleUnpause();
+			}
+		}
+	
+		/* Pause menu */
+		if (CBGame.Data.paused) {
+			if (this.cursors.up.justPressed(1)) {
+				this.pauseSelected = (this.pauseSelected - 1) % 2;
+			} else if (this.cursors.down.justPressed(1)) {
+				this.pauseSelected = (this.pauseSelected + 1) % 2;
+			} else if (this.A.justPressed(1)) {
+				if (this.pauseSelected == 0) {
+					CBGame.Data.paused = false;
+					this.handleUnpause();
+				} else {
+					CBGame.Data.paused = false;
+					this.handleUnpause();
+					this.player.onTimeout();
+				}
+			}
+			
+			if (this.pauseSelected == 0) {
+				this.continueText.text = 'Œ CONTINUE';
+				this.restartText.text =  '  RESTART';
+			} else {
+				this.continueText.text = '  CONTINUE';
+				this.restartText.text =  'Œ RESTART';
+			}
+		}
+	
 		this.player.beforeUpdate();
 		for (var i = 0; i < this.enemies.children.length; i++) {
 			this.enemies.getAt(i).wrappedBy.beforeUpdate();
@@ -80,13 +144,14 @@ CBGame.Gameplay.prototype = {
 		if (this.player.isAlive) {
 			this.physics.arcade.collide(this.player.self, this.ground);
 			this.physics.arcade.collide(this.player.self, this.oneways);
-			this.physics.arcade.collide(this.player.self, this.bombs);
+			this.physics.arcade.collide(this.player.self, this.bombs, null, this.handleCatVsBomb);
 			this.physics.arcade.overlap(this.player.self, this.ladders, 
 				this.player.onLadder, null, this.player);
 			this.physics.arcade.overlap(this.player.self, this.door.self, 
 				this.player.onDoor, null, this.player);
 
 			if (!this.player.DEBUG) {
+				this.physics.arcade.collide(this.player.self, this.locks);
 				this.physics.arcade.collide(this.player.self, this.fire, 
 					this.player.onHitFire, null, this.player);
 				this.physics.arcade.overlap(this.player.self, this.fire, 
@@ -100,15 +165,20 @@ CBGame.Gameplay.prototype = {
 			}
 		}
 
-		this.physics.arcade.collide(this.bombs, this.ground);
+		this.physics.arcade.collide(this.bombs, this.ground, null, this.handeBombVsGround, this);
+		this.physics.arcade.collide(this.bombs, this.bombs, null, this.handleBombVsBomb, this);
 		this.physics.arcade.collide(this.bombs, this.oneways);
+		this.physics.arcade.collide(this.bombs, this.locks);
 		this.physics.arcade.collide(this.enemies, this.ground);
 		this.physics.arcade.collide(this.enemies, this.oneways);
+		this.physics.arcade.collide(this.enemies, this.locks);
+		this.physics.arcade.collide(this.keys, this.ground);
+		this.physics.arcade.collide(this.keys, this.oneways);
 		
 		if (this.door)
 			this.door.onUpdate();
 
-		this.player.onUpdate();	
+		this.player.onUpdate();
 
 		for (var i = 0; i < this.bombs.children.length; i++) {
 			this.bombs.getAt(i).wrappedBy.onUpdate();
@@ -126,6 +196,9 @@ CBGame.Gameplay.prototype = {
 		if (this.debugNextLevel.justPressed()) {
 			CBGame.Data.nextLevel(this);
 		}
+
+		// Sort
+		this.world.sort();
 	},
 
 	render: function() {
@@ -143,6 +216,8 @@ CBGame.Gameplay.prototype = {
 				this.game.debug.body(this.explosions.children[i]);
 			for (var i = 0; i < this.enemies.children.length; i++)
 				this.game.debug.body(this.enemies.children[i]);
+			for (var i = 0; i < this.keys.children.length; i++)
+				this.game.debug.body(this.keys.children[i]);
 			this.game.debug.body(this.door.self);
 		}
 
@@ -198,6 +273,19 @@ CBGame.Gameplay.prototype = {
 					door.onCreate();
 					this.door = door;
 					break;
+				case "Key":
+					var key = new CBGame.Key(o.x, o.y, this.game, this);
+					key.self.name = "key"+index;
+					this.keys.add(key.self);
+					key.onCreate();
+					break;
+				case "Lock":
+					var lock = this.locks.create(o.x, o.y, "skeleton");
+					lock.animations.add('idle', [0], 1, true);
+					lock.animations.play('idle');
+					lock.name = "lock"+index;
+					lock.body.immovable = true;
+					break;
 				case "Walker":
 					var enemy = new CBGame.EnemyWalker(o.x, o.y, this.game, this);
 					enemy.onCreate();
@@ -222,11 +310,88 @@ CBGame.Gameplay.prototype = {
 	
 	renderText: function(x, y, string, fixedToCamera) {
 		var text = string.toUpperCase();
-		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+		var style = { font: "8px Press Start, Monospace", fill: "#282828", align: "left" };
 
 		var text = this.add.text(x, y, text, style);
 		text.fixedToCamera = fixedToCamera;
 		return text;
+	},
+	
+	handlePause: function() {
+		this.pauseSelected = 0;
+		this.pauseText.visible = true;
+		this.pauseBack.visible = true;
+		this.continueText.visible = true;
+		this.restartText.visible = true;
+		
+		this.pauseBack.bringToTop();
+		this.pauseText.z = this.pauseBack.z+1;
+		this.continueText.z = this.pauseText.z+1;
+		this.restartText.z = this.continueText.z+1;
+		
+		// Pause non-sentient entities
+		for (var i = 0; i < this.fire.children.length; i++)
+			this.fire.getAt(i).animations.paused = true;
+	},
+	
+	handleUnpause: function() {
+		this.pauseText.visible = false;
+		this.pauseBack.visible = false;
+		this.continueText.visible = false;
+		this.restartText.visible = false;
+		
+		// Unpause non-sentient entities
+		for (var i = 0; i < this.fire.children.length; i++)
+			this.fire.getAt(i).animations.paused = false;
+	},
+	
+	handeBombVsGround: function(bomb, tile) {
+		if (bomb.body.velocity.x != 0 && bomb.body.onFloor()) {
+			bomb.body.velocity.x = 0;
+			bomb.body.bounce.y = 3;
+		}
+		return true;
+	},
+	
+	handleCatVsBomb: function(cat, bomb) {
+		if (cat.body.velocity.y != 0)
+			return true;
+		else 
+			return false;
+	},
+	
+	handleBombVsBomb: function(bomb1, bomb2) {
+		// Bouncy funkyness
+		/*if (bomb1 == bomb2)
+			return false;
+		else {
+			if (bomb1.body.velocity.x != 0 && bomb1.body.velocity.y >= 0) {
+				bomb2.body.velocity.x = bomb1.body.velocity.x * 0.7;
+				bomb1.body.velocity.x *= -0.2;
+				bomb1.body.velocity.y = -10;
+			} else if (bomb2.body.velocity.x != 0 && bomb2.body.velocity.y >= 0) {
+				bomb1.body.velocity.x = bomb2.body.velocity.x * 0.7;
+				bomb2.body.velocity.x *= -0.2;
+				bomb2.body.velocity.y = -10;
+			}
+			return true;
+		}*/
+		
+		// Snappity landoline
+		/*if (bomb1 == bomb2)
+			return false;
+		else {
+			if (bomb1.body.velocity.x != 0 && bomb1.body.velocity.y >= 0) {
+				var dir = CBGame.Utils.sign(bomb1.body.velocity.x);
+				bomb2.x = ((bomb2.x + dir*8) % 8) * 8;
+				bomb1.x = bomb2.x + dir*8;
+			} else if (bomb2.body.velocity.x != 0 && bomb2.body.velocity.y >= 0) {
+				var dir = CBGame.Utils.sign(bomb2.body.velocity.x)
+				bomb1.x = ((bomb1.x + dir*8) % 8) * 8;
+				bomb2.x = bomb1.x + dir*8;
+			}
+			return true;
+		}*/
 	}
 }
 
@@ -260,7 +425,7 @@ CBGame.PreGameplay.prototype = {
 	// Remember to NOT copy this and generalize!!
 	renderText: function(x, y, string) {
 		var text = string.toUpperCase();
-		var style = { font: "8px Press Start", fill: "#282828", align: "left" };
+		var style = { font: "8px Press Start, Monospace", fill: "#282828", align: "left" };
 
 		this.add.text(x, y, text, style);
 	}

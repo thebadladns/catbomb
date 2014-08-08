@@ -62,6 +62,7 @@ CBGame.Cat.prototype = {
 			type: this.TYPE_NONE,
 			reference: null
 		}
+		this.pauseStorage = {};
 	},
 
 	beforeUpdate: function() {
@@ -75,13 +76,39 @@ CBGame.Cat.prototype = {
 			this.self.onLadder = false;
 			this.self.onOpenDoor = false;
 			this.self.body.velocity.x = 0;
-			/*if (this.carrying.type != this.TYPE_NONE) {
-				this.carrying.reference.body.velocity.x = 0;
-			}*/
 		}
 	},
 
 	onUpdate: function() {
+		if (CBGame.Data.paused) {
+			// Store values if any
+			if (!this.pauseStorage.body) {
+				this.pauseStorage.body = {
+					xvelocity: this.self.body.velocity.x,
+					yvelocity: this.self.body.velocity.y,
+					gravity: this.self.body.gravity.y
+				};
+			}
+			// Pause!
+			this.self.body.velocity.x = 0;
+			this.self.body.velocity.y = 0;
+			this.self.body.gravity.y = 0;
+			// Don't move!
+			this.self.animations.stop();
+			// And don't bother!
+			return;
+		} else {
+			// Restore if we have not done it yet
+			if (this.pauseStorage.body) {
+				this.self.body.velocity.x = this.pauseStorage.body.xvelocity;
+				this.self.body.velocity.y = this.pauseStorage.body.yvelocity;
+				this.self.body.gravity.y = this.pauseStorage.body.gravity;
+			}
+			// Clean
+			this.pauseStorage = {};
+		}
+			
+	
 		// Debug
 		if (this.debugKey.justPressed())
 			this.DEBUG = !this.DEBUG;
@@ -143,6 +170,7 @@ CBGame.Cat.prototype = {
 						// Got anything
 						// Make it portable
 						var bomb = carryData.reference;
+						bomb.bringToTop();
 						bomb.body.immovable = false;
 						bomb.body.gravity.y = 0;
 						// Lift it
@@ -162,21 +190,23 @@ CBGame.Cat.prototype = {
 					bomb.body.gravity.y = this.GRAVITY;
 					// Drop it
 					bomb.z = bomb.oldz;
-					bomb.y += 4;
+					// bomb.y += 4;
 					if (this.facing == this.LEFT) {
-						if (this.self.body.onWall()) {
+						/*if (this.self.body.onWall()) {
 							bomb.x = this.self.x;
 							this.self.x += 16;
 						} else {
 							bomb.x = this.self.x - 16;
-						}
+						}*/
+						bomb.body.velocity.x = -30;
 					} else if (this.facing == this.RIGHT) {
-						if (this.self.body.onWall()) {
+						/*if (this.self.body.onWall()) {
 							bomb.x = this.self.x;
 							this.self.x -= 16;
 						} else {
 							bomb.x = this.self.x + 16;
-						}
+						}*/
+						bomb.body.velocity.x = 30;
 					}
 					// And forget you got it
 					this.carrying.type = this.TYPE_NONE;
@@ -247,12 +277,18 @@ CBGame.Cat.prototype = {
 		this.self.y = Math.round(this.self.y);
 		if (this.carrying.type != this.TYPE_NONE) {
 			var bomb = this.carrying.reference;
+			var xoffset, yoffset;
+			switch (this.carrying.type) {
+				case this.TYPE_BOMB: 	xoffset = 8; yoffset = -8; break;
+				case this.TYPE_KEY: 	xoffset = 10; yoffset = -1; break;
+			}
+			
 			// Lift it
-			bomb.y = this.self.y - 8;
+			bomb.y = this.self.y + yoffset;
 			if (this.facing == this.LEFT) {
-				bomb.x = this.self.x - 8;
+				bomb.x = this.self.x - xoffset;
 			} else if (this.facing == this.RIGHT) {
-				bomb.x = this.self.x + 8;
+				bomb.x = this.self.x + xoffset;
 			}
 		}
 	},
@@ -302,10 +338,11 @@ CBGame.Cat.prototype = {
 			testx += 1;
 		}
 
-		// Move the body temprarily to check for bombs!
+		// Move the body temprarily to check for pickables
 		var oldx = this.self.body.x;
 		this.self.body.x = testx;
 
+		// We would like to lift a bomb, yo
 		var bombs = this.scene.bombs;
 		for (var i = 0; i < bombs.length; i++) {
 			var bomb = bombs.getAt(i);
@@ -317,7 +354,21 @@ CBGame.Cat.prototype = {
 				break;
 			}
 		}
-
+		// If no bomb found, check those keys bro
+		if (result.type == this.TYPE_NONE) {
+			var keys = this.scene.keys;
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys.getAt(i);
+				if (!key || !key.body)
+					continue;
+				if (this.game.physics.arcade.intersects(this.self.body, key.body)) {
+					result.type = this.TYPE_KEY;
+					result.reference = key;
+					break;
+				}
+			}
+		}
+		
 		this.self.body.x = oldx;
 
 		return result;

@@ -41,6 +41,8 @@ CBGame.EnemyWalker.prototype = {
 		// Avoid climbing just as level starts
 		this.endClimb();
 
+		this.pauseStorage = {};
+		
 		this.KILLME = this.game.input.keyboard.addKey(Phaser.Keyboard.K);
 	},
 	
@@ -50,6 +52,34 @@ CBGame.EnemyWalker.prototype = {
 	},
 	
 	onUpdate: function() {
+		if (CBGame.Data.paused) {
+			// Store values if any
+			if (!this.pauseStorage.body) {
+				this.pauseStorage.body = {
+					xvelocity: this.self.body.velocity.x,
+					yvelocity: this.self.body.velocity.y,
+					gravity: this.self.body.gravity.y
+				};
+			}
+			// Pause!
+			this.self.body.velocity.x = 0;
+			this.self.body.velocity.y = 0;
+			this.self.body.gravity.y = 0;
+			// Don't move!
+			this.self.animations.stop();
+			// And don't bother!
+			return;
+		} else {
+			// Restore if we have not done it yet
+			if (this.pauseStorage.body) {
+				this.self.body.velocity.x = this.pauseStorage.body.xvelocity;
+				this.self.body.velocity.y = this.pauseStorage.body.yvelocity;
+				this.self.body.gravity.y = this.pauseStorage.body.gravity;
+			}
+			// Clean
+			this.pauseStorage = {};
+		}
+	
 		if (this.KILLME.justPressed()) 
 			this.onDeath();
 
@@ -144,7 +174,7 @@ CBGame.EnemyWalker.prototype = {
 	endClimb: function() {
 		this.state = this.STATE_WALK;
 		this.justClimbed = true;
-		var timer = timer = this.game.time.create(true);
+		var timer = this.game.time.create(true);
 		timer.add(500, this.onTimer, this);
 		timer.start();
 	},
@@ -200,6 +230,13 @@ CBGame.DissolveFx.prototype = {
 	},
 
 	onUpdate: function() {
+		if (CBGame.Data.paused) {
+			this.self.animations.paused = true;
+		} else {
+			if (this.self.animations.paused)
+				this.self.animations.paused = false;
+		}
+	
 		if (this.self.animations.currentAnim.isFinished) {
 			this.self.destroy();
 		}

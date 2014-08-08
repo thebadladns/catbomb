@@ -2,7 +2,7 @@ window.onload = function() {
 
 	var game = new Phaser.Game(160, 144, Phaser.CANVAS, '');
 	window.pixel = { 
-		scale: 3, 
+		scale: 1, 
 		canvas: null, 
 		context: null, 
 		width: 0, 

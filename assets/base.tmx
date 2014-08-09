@@ -24,5 +24,6 @@
   <object name="Key" x="48" y="40" width="16" height="16"/>
   <object name="Fire" type="Fire" x="8" y="40" width="16" height="16"/>
   <object name="Walker" type="Skeleton" x="88" y="24"/>
+  <object name="Stop" x="80" y="24" width="8" height="32"/>
  </objectgroup>
 </map>

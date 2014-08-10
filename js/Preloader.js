@@ -11,7 +11,7 @@ CBGame.Data = {
 	
 	/*LEVELS: 4,
 	WORLDS: 4,*/
-	LEVELS: 7,
+	LEVELS: 9,
 	WORLDS: 1,
 
 	reset: function() {
@@ -86,15 +86,18 @@ CBGame.Preloader.prototype = {
 		this.load.image('basic', 'assets/tilesbasic.png');
 
 		// Levels
+		var n = 1;
 		// this.load.tilemap('stage1-1', 'assets/test.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-1', 'assets/0.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-2', 'assets/1.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-3', 'assets/levelt1.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-4', 'assets/6.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-5', 'assets/chainofbombs.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-6', 'assets/5.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-7', 'assets/lockasplatform.json', null, Phaser.Tilemap.TILED_JSON);
-		this.load.tilemap('stage1-8', 'assets/6.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/tutorial.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/0.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/1.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/levelt1.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/chaintutorial.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/6.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/chainofbombs.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/5.json', null, Phaser.Tilemap.TILED_JSON);
+		this.load.tilemap('stage1-' + (n++), 'assets/lockasplatform.json', null, Phaser.Tilemap.TILED_JSON);
+		// this.load.tilemap('stage1-9', 'assets/6.json', null, Phaser.Tilemap.TILED_JSON);
 
 		// Sprites
 		this.load.image('ground', 'assets/ground.png');

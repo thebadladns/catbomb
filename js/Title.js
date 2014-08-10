@@ -61,3 +61,29 @@ CBGame.GameOver.prototype = {
 		return text;
 	}
 }
+
+CBGame.Intro = function(game) {
+
+};
+
+CBGame.Intro.prototype = {
+	create: function() {
+
+	},
+
+	update: function() {
+
+	},
+
+	render: function() {
+
+	},
+
+	renderText: function(x, y, string, fixedToCamera) {
+		string = string.toUpperCase();
+		var text = this.add.bitmapText(x, y, 'font', string, 8);
+		text.setText(string);
+		text.fixedToCamera = fixedToCamera;
+		return text;
+	}
+}

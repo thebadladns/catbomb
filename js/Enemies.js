@@ -208,6 +208,7 @@ CBGame.EnemyWalker.prototype = {
 	onDeath: function() {
 		var fx = new CBGame.DissolveFx(this.self.x, this.self.y, this.game, this.scene);
 		fx.onCreate();
+		CBGame.Data.lives++;
 		this.self.destroy();
 	}
 };

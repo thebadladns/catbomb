@@ -112,22 +112,13 @@ CBGame.Gameplay.prototype = {
 
 	update: function() {
 
-		if (this.StartButton.justPressed(1)) {
-			CBGame.Data.paused = !CBGame.Data.paused;
-			if (CBGame.Data.paused) {
-				this.handlePause();
-			} else {
-				this.handleUnpause();
-			}
-		}
-	
 		/* Pause menu */
 		if (CBGame.Data.paused) {
 			if (this.cursors.up.justPressed(1)) {
 				this.pauseSelected = (this.pauseSelected - 1) % 2;
 			} else if (this.cursors.down.justPressed(1)) {
 				this.pauseSelected = (this.pauseSelected + 1) % 2;
-			} else if (this.A.justPressed(1)) {
+			} else if (this.A.justPressed(1) || this.StartButton.justPressed(1)) {
 				if (this.pauseSelected == 0) {
 					CBGame.Data.paused = false;
 					this.handleUnpause();
@@ -144,6 +135,15 @@ CBGame.Gameplay.prototype = {
 			} else {
 				this.continueText.text = '  CONTINUE';
 				this.restartText.text =  'Œ RESTART';
+			}
+		} else {
+			if (this.StartButton.justPressed(1)) {
+				CBGame.Data.paused = !CBGame.Data.paused;
+				if (CBGame.Data.paused) {
+					this.handlePause();
+				} else {
+					this.handleUnpause();
+				}
 			}
 		}
 	
@@ -216,6 +216,10 @@ CBGame.Gameplay.prototype = {
 
 	render: function() {
 	
+		if (CBGame.Data.lives > 99)
+			CBGame.Data.lives = 99;
+		this.livesLabel.text = "Œ" + CBGame.Utils.pad(CBGame.Data.lives, 2);
+
 		if (this.player.DEBUG) {
 			this.player.onRender();
 
@@ -248,6 +252,8 @@ CBGame.Gameplay.prototype = {
 					// this.player = this.add.sprite(o.x, o.y, 'cat');
 					this.player = new CBGame.Cat(o.x, o.y, this.game, this);
 					this.player.onCreate();
+					if (o.properties.facing)
+						this.player.facing = parseInt(o.properties.facing);
 					break;
 				case "Ladder":
 					// Spawn the ladder
@@ -343,12 +349,13 @@ CBGame.Gameplay.prototype = {
 		this.pauseBack.visible = true;
 		this.continueText.visible = true;
 		this.restartText.visible = true;
-		
+		this.stageTimeCounter.pause();
+
 		this.pauseBack.bringToTop();
 		this.pauseText.z = this.pauseBack.z+1;
 		this.continueText.z = this.pauseText.z+1;
 		this.restartText.z = this.continueText.z+1;
-		
+
 		// Pause non-sentient entities
 		for (var i = 0; i < this.fire.children.length; i++)
 			this.fire.getAt(i).animations.paused = true;
@@ -359,6 +366,7 @@ CBGame.Gameplay.prototype = {
 		this.pauseBack.visible = false;
 		this.continueText.visible = false;
 		this.restartText.visible = false;
+		this.stageTimeCounter.resume();
 		
 		// Unpause non-sentient entities
 		for (var i = 0; i < this.fire.children.length; i++)

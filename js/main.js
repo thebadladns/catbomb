@@ -15,6 +15,7 @@ window.onload = function() {
 	
 	game.state.add('Preloader', CBGame.Preloader);
 	game.state.add('Title', CBGame.TitleScreen);
+	game.state.add('Intro', CBGame.Intro);
 	game.state.add('PreGameplay', CBGame.PreGameplay);
 	game.state.add('Gameplay', CBGame.Gameplay);
 	game.state.add('GameOver', CBGame.GameOver);

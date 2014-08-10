@@ -81,6 +81,7 @@ CBGame.Preloader.prototype = {
 
 		// Font
 		game.load.bitmapFont('font', 'assets/font.png', 'assets/font.xml');
+		game.load.bitmapFont('fontwhite', 'assets/fontwhite.png', 'assets/fontwhite.xml');
 
 		// Tiles
 		this.load.image('basic', 'assets/tilesbasic.png');
@@ -102,6 +103,7 @@ CBGame.Preloader.prototype = {
 		// Sprites
 		this.load.image('ground', 'assets/ground.png');
 		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
+		this.load.spritesheet('cateatbomb', 'assets/eatbomb.png', 40, 24);
 		this.load.spritesheet('bomb', 'assets/bomb.png', 20, 20);
 		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
 		this.load.spritesheet('explosion', 'assets/boomv2.png', 32, 32);

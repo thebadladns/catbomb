@@ -144,6 +144,7 @@ CBGame.EnemyWalker.prototype = {
 			this.self.body.gravity.y = 0;
 			this.self.body.velocity.x = 0;
 			this.self.body.velocity.y = 0;
+			this.self.body.acceleration.y = 0;
 			if (this.self.onLadder && this.climbing != this.NONE) {
 				var ladder = this.self.currentLadder;
 				if (this.climbing == this.UP) {

@@ -26,5 +26,6 @@
    </properties>
   </object>
   <object name="Cat" type="Cat" x="64" y="96"/>
+  <object name="Key" x="128" y="96" width="16" height="16"/>
  </objectgroup>
 </map>

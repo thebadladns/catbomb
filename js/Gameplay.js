@@ -179,13 +179,14 @@ CBGame.Gameplay.prototype = {
 		this.physics.arcade.collide(this.bombs, this.ground, null, this.handeBombVsGround, this);
 		this.physics.arcade.collide(this.bombs, this.bombs, null, this.handleBombVsBomb, this);
 		this.physics.arcade.collide(this.bombs, this.oneways);
-		this.physics.arcade.collide(this.bombs, this.locks);
+		this.physics.arcade.collide(this.bombs, this.locks, this.handleBombVsLock, this.handleBombVsLock);
 		this.physics.arcade.collide(this.enemies, this.ground);
 		this.physics.arcade.collide(this.enemies, this.oneways);
-		this.physics.arcade.collide(this.enemies, this.locks);
+		this.physics.arcade.collide(this.enemies, this.locks, this.handleEnemyVsLock);
 		this.physics.arcade.collide(this.enemies, this.stop, this.handleEnemyVsStop);
-		this.physics.arcade.collide(this.keys, this.ground, this.handeBombVsGround);
-		this.physics.arcade.collide(this.keys, this.oneways, this.handeBombVsGround);
+		this.physics.arcade.collide(this.keys, this.ground, null, this.handeBombVsGround, this);
+		this.physics.arcade.collide(this.keys, this.oneways, null, this.handeBombVsGround, this);
+		this.physics.arcade.collide(this.keys, this.bombs, null, this.handeBombVsGround, this);
 		
 		if (this.door)
 			this.door.onUpdate();
@@ -371,6 +372,22 @@ CBGame.Gameplay.prototype = {
 		}
 		return true;
 	},
+
+	checkBombVsLock: function(bomb, lock) {
+		return true;
+	},
+
+	handleBombVsLock: function(bomb, lock) {
+		if (bomb.body.velocity.y != 0 && lock.y >= bomb.y + bomb.height) {
+			bomb.wrappedBy.onHitGround();
+		} else if (bomb.body.velocity.x != 0 && bomb.body.gravity != 0) {
+			bomb.body.velocity.x *= -1;
+		} else {
+			bomb.wrappedBy.onHitGround();
+		}
+
+		return true;
+	},
 	
 	handleCatVsBomb: function(cat, bomb) {
 		if (cat.body.velocity.y != 0)
@@ -386,6 +403,11 @@ CBGame.Gameplay.prototype = {
 			var t = enemy.game.time.create(true);
 			t.add(5, function() {enemy.lastStop = undefined; console.log("yay")});
 		}
+	},
+
+	handleEnemyVsLock: function(enemy, stop) {
+		if (enemy.body.touching.right || enemy.body.touching.left)
+			enemy.wrappedBy.onHitWall();
 	},
 
 	handleBombVsBomb: function(bomb1, bomb2) {

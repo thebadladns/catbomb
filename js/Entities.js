@@ -29,8 +29,6 @@ CBGame.Bomb.prototype = {
 		this.self.body.center.setTo(8, 8);
 		this.self.body.setSize(12, 12, 2, 8);
 		this.self.body.collideWithBounds = true;
-		/*this.self.body.checkCollision.left = false;
-		this.self.body.checkCollision.right = false;*/
 		this.self.body.bounce.y = 0.3;
 
 		// Spawn the oneway platform of the top
@@ -148,6 +146,14 @@ CBGame.Bomb.prototype = {
 		boom.onCreate();
 		this.oneway.destroy();
 		this.self.destroy();
+	},
+
+	onHitGround: function() {
+		this.self.body.velocity.x = 0;
+		this.self.body.velocity.y = 0;
+		this.self.body.acceleration.y = 0;
+		this.self.body.bounce.y = 0;
+		this.self.body.gravity.y = 0;
 	}
 }
 
@@ -286,8 +292,6 @@ CBGame.Key.prototype = {
 		this.self.body.center.setTo(8, 8);
 		this.self.body.setSize(14, 14, 1, 1);
 		this.self.body.collideWithBounds = true;
-		this.self.body.checkCollision.left = false;
-		this.self.body.checkCollision.right = false;
 		this.self.body.bounce.y = 0.3;
 
 		// Spawn the oneway platform of the top

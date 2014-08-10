@@ -92,6 +92,19 @@
                  "width":0,
                  "x":64,
                  "y":96
+                }, 
+                {
+                 "height":16,
+                 "name":"Key",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":128,
+                 "y":96
                 }],
          "opacity":1,
          "type":"objectgroup",

@@ -105,7 +105,7 @@ CBGame.Gameplay.prototype = {
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		this.A = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
 		
-		this.debugNextLevel = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
+		// this.debugNextLevel = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
 		
 		CBGame.Data.paused = false;
 	},
@@ -161,7 +161,7 @@ CBGame.Gameplay.prototype = {
 			this.physics.arcade.overlap(this.player.self, this.door.self, 
 				this.player.onDoor, null, this.player);
 
-			if (!this.player.DEBUG) {
+			//if (!this.player.DEBUG) {
 				this.physics.arcade.collide(this.player.self, this.locks);
 				this.physics.arcade.collide(this.player.self, this.fire, 
 					this.player.onHitFire, null, this.player);
@@ -173,7 +173,7 @@ CBGame.Gameplay.prototype = {
 					this.player.onHitEnemy, null, this.player);
 				this.physics.arcade.overlap(this.player.self, this.explosions, 
 					this.player.onHitExplosion, null, this.player);
-			}
+			//}
 		}
 
 		this.physics.arcade.collide(this.bombs, this.ground, null, this.handeBombVsGround, this);
@@ -206,9 +206,9 @@ CBGame.Gameplay.prototype = {
 			this.enemies.getAt(i).wrappedBy.onUpdate();
 		}
 
-		if (this.debugNextLevel.justPressed()) {
+		/*if (this.debugNextLevel.justPressed()) {
 			CBGame.Data.nextLevel(this);
-		}
+		}*/
 
 		// Sort
 		this.world.sort();
@@ -220,7 +220,7 @@ CBGame.Gameplay.prototype = {
 			CBGame.Data.lives = 99;
 		this.livesLabel.text = "Œ" + CBGame.Utils.pad(CBGame.Data.lives, 2);
 
-		if (this.player.DEBUG) {
+		/*if (this.player.DEBUG) {
 			this.player.onRender();
 
 			for (var i = 0; i < this.ladders.children.length; i++)
@@ -238,7 +238,7 @@ CBGame.Gameplay.prototype = {
 			for (var i = 0; i < this.stop.children.length; i++)
 				this.game.debug.body(this.stop.children[i]);
 			this.game.debug.body(this.door.self);
-		}
+		}*/
 
 		pixel.render();
 	},

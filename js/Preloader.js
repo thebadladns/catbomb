@@ -28,7 +28,7 @@ CBGame.Data = {
 			this.world++;
 			if (this.world > this.WORLDS) {
 				// win!
-				scene.game.state.start("GameOver");
+				scene.game.state.start("Ending");
 				return;
 			} else {
 				// next world
@@ -74,7 +74,8 @@ CBGame.Preloader.prototype = {
 		// this.load.atlas('spriteset', 'assets/spritesheet.png', 'assets/spritesheet.json');
 
 		// Images
-		this.load.image('logo', 'assets/dummy.png');
+		this.load.image('logo', 'assets/badladnslogo.png');
+		this.load.image('gameby', 'assets/gameby.png');
 		this.load.image('title', 'assets/titletemp.png');
 		this.load.image('gameover', 'assets/gameovertemp.png');
 		this.load.image('hud', 'assets/hud.png');
@@ -104,6 +105,7 @@ CBGame.Preloader.prototype = {
 		this.load.image('ground', 'assets/ground.png');
 		this.load.spritesheet('cat', 'assets/cat.png', 16, 16);
 		this.load.spritesheet('cateatbomb', 'assets/eatbomb.png', 40, 24);
+		this.load.spritesheet('catty', 'assets/catlady.png', 16, 16);
 		this.load.spritesheet('bomb', 'assets/bomb.png', 20, 20);
 		this.load.spritesheet('fire', 'assets/fire.png', 16, 16);
 		this.load.spritesheet('explosion', 'assets/boomv2.png', 32, 32);
@@ -125,7 +127,7 @@ CBGame.Preloader.prototype = {
 	update: function() {
 		if (/*this.cache.isSoundDecoded('...') && */!this.ready) {
 			this.ready = true;
-			this.state.start("Title");
+			this.state.start("BadladnsLogo");
 		}
 	},
 	

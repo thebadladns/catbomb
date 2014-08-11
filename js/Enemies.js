@@ -4,8 +4,8 @@ CBGame.EnemyWalker = function(x, y, game, scene) {
 	this.game = game;
 	this.scene = scene;
 	
-	this.self.inputEnabled = true;
-	this.self.input.enableDrag();
+	/*this.self.inputEnabled = true;
+	this.self.input.enableDrag();*/
 };
 
 CBGame.EnemyWalker.prototype = {
@@ -46,7 +46,7 @@ CBGame.EnemyWalker.prototype = {
 
 		this.pauseStorage = {};
 		
-		this.KILLME = this.game.input.keyboard.addKey(Phaser.Keyboard.K);
+		// this.KILLME = this.game.input.keyboard.addKey(Phaser.Keyboard.K);
 	},
 	
 	beforeUpdate: function() {
@@ -83,8 +83,8 @@ CBGame.EnemyWalker.prototype = {
 			this.pauseStorage = {};
 		}
 	
-		if (this.KILLME.justPressed()) 
-			this.onDeath();
+		/*if (this.KILLME.justPressed()) 
+			this.onDeath();*/
 
 		// Check for explosions!
 		var es = this.scene.explosions;

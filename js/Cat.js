@@ -19,11 +19,11 @@ CBGame.Cat = function(x, y, game, scene) {
 	this.B = game.input.keyboard.addKey(Phaser.Keyboard.S);
 
 	// Debug
-	this.self.inputEnabled = true;
-	this.self.input.enableDrag();
+	/*this.self.inputEnabled = true;
+	this.self.input.enableDrag();*/
 	
-	this.debugKey = game.input.keyboard.addKey(Phaser.Keyboard.J);
-	this.DEBUG = false;
+	/*this.debugKey = game.input.keyboard.addKey(Phaser.Keyboard.J);
+	this.DEBUG = false;*/
 }
 
 CBGame.Cat.prototype = {
@@ -66,11 +66,11 @@ CBGame.Cat.prototype = {
 	},
 
 	beforeUpdate: function() {
-		if (this.DEBUG) {
+		/*if (this.DEBUG) {
 			this.isAlive = true;
 			this.storedVelocityX = 0;
 			this.storedVelocityY = 0;
-		}
+		}*/
 
 		if (this.isAlive) {
 			this.self.onLadder = false;
@@ -110,13 +110,13 @@ CBGame.Cat.prototype = {
 			
 	
 		// Debug
-		if (this.debugKey.justPressed())
+		/*if (this.debugKey.justPressed())
 			this.DEBUG = !this.DEBUG;
 		
 		if (this.DEBUG)
 				this.self.tint = 0x02d3a0;
 			else
-				this.self.tint = 0xffffff;
+				this.self.tint = 0xffffff;*/
 
 		if (this.isAlive) {
 
@@ -301,7 +301,7 @@ CBGame.Cat.prototype = {
 	},
 
 	onRender: function() {
-		this.game.debug.body(this.self);
+		// this.game.debug.body(this.self);
 	},
 
 	onLadder: function(me, ladder) {
